@@ -23,9 +23,10 @@
         @csrf
 
         <div>
-            <label for="email" class="block text-sm font-medium text-stone-700 mb-1">Email</label>
-            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
-                class="w-full rounded-lg border border-stone-300 px-3 py-2 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600">
+            <label for="user_id" class="block text-sm font-medium text-stone-700 mb-1">User ID</label>
+            <input id="user_id" type="text" name="user_id" value="{{ old('user_id') }}" required autofocus autocomplete="username"
+                class="w-full rounded-lg border border-stone-300 px-3 py-2 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                placeholder="e.g. PLR000123">
         </div>
 
         <div>
@@ -45,7 +46,7 @@
     </form>
 
     <p class="mt-6 text-sm text-stone-600 text-center">
-        Don't have an account?
-        <a href="{{ route('register') }}" class="text-emerald-800 font-medium hover:underline">Register</a>
+        Need to register?
+        <a href="{{ route('register') }}" class="text-emerald-800 font-medium hover:underline">Start a new registration</a>
     </p>
 @endsection

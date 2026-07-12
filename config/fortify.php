@@ -45,7 +45,7 @@ return [
     |
     */
 
-    'username' => 'email',
+    'username' => 'user_id',
 
     'email' => 'email',
 
@@ -60,7 +60,7 @@ return [
     |
     */
 
-    'lowercase_usernames' => true,
+    'lowercase_usernames' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -73,7 +73,7 @@ return [
     |
     */
 
-    'home' => '/',
+    'home' => '/dashboard',
 
     /*
     |--------------------------------------------------------------------------
@@ -144,7 +144,8 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Public self-registration is replaced by the custom onboarding flows
+        // (individual / federation / club) under /register.
         Features::resetPasswords(),
         // Features::emailVerification(),
         Features::updateProfileInformation(),
