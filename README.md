@@ -52,5 +52,24 @@ Local dev uses **SQLite** (already configured). Production VPS uses MySQL + Redi
 
 District seed data (55 MP districts): [`data/mp-districts.json`](data/mp-districts.json)
 
+## Deployment
+
+Code is on GitHub: **https://github.com/YOU1306/mp-sepaktakraw** (private).
+Full step-by-step production deployment (VPS, DNS, SSL, SMTP, GitHub Actions
+auto-deploy, backups, going-live checklist) is documented in
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Deployment tooling lives in
+[`deploy/`](deploy/) — `server-setup.sh` (one-time VPS bootstrap) and
+`deploy.sh` (every deploy after that).
+
+**Known gap before enabling real fees:** Razorpay integration is currently a
+test-mode stub (see `docs/DEPLOYMENT.md` §6) — Checkout.js widget, signature
+verification, and the webhook route still need to be built. Federation/Club
+fees default to ₹0 so this doesn't block launching the public site,
+registrations, and admin/approval workflows.
+
 ## Status
-**Phase 0 complete on this machine** (native path, no Docker): Laravel 13 + Filament 4 + Fortify + spatie/permission + Razorpay SDK installed. Next: migrations, RBAC, admin panel, registrations per [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Public site, auth/RBAC, admin panel, and individual/federation/club
+registration flows (with document uploads and a government-portal-style,
+tricolour-themed UI) are built and tested locally (14 passing tests). Next:
+finish the real Razorpay gateway integration, then follow
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) to go live.

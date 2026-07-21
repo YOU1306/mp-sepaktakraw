@@ -1,0 +1,17 @@
+; Supervisor config for the Laravel queue worker (emails, image processing).
+; Templated by deploy/server-setup.sh (__APP_DIR__, __DEPLOY_USER__, __PHP_VERSION__ get substituted).
+; Installed to /etc/supervisor/conf.d/mp-sepaktakraw-worker.conf
+
+[program:mp-sepaktakraw-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php__PHP_VERSION__ __APP_DIR__/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+directory=__APP_DIR__
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=__DEPLOY_USER__
+numprocs=1
+redirect_stderr=true
+stdout_logfile=__APP_DIR__/storage/logs/worker.log
+stopwaitsecs=3600

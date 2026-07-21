@@ -1,0 +1,48 @@
+# Nginx server block for the MP Sepaktakraw Federation portal.
+# Templated by deploy/server-setup.sh (__DOMAIN__, __PHP_VERSION__, __APP_DIR__ get substituted).
+# Certbot will add the TLS server block automatically when you run `certbot --nginx`.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __DOMAIN__ www.__DOMAIN__;
+
+    root __APP_DIR__/public;
+    index index.php;
+
+    client_max_body_size 20M;   # registration document uploads (Aadhaar, marksheets, photos)
+
+    access_log /var/log/nginx/__DOMAIN__.access.log;
+    error_log  /var/log/nginx/__DOMAIN__.error.log;
+
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php__PHP_VERSION__-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_read_timeout 120;
+    }
+
+    # Never serve dotfiles (.env, .git, etc.)
+    location ~ /\. {
+        deny all;
+    }
+
+    # Cache static assets aggressively; Vite fingerprints filenames so this is safe.
+    location ~* \.(?:css|js|woff2?|ttf|svg|png|jpe?g|gif|ico|webp)$ {
+        expires 30d;
+        access_log off;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+}
