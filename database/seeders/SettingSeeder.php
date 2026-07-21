@@ -13,7 +13,7 @@ class SettingSeeder extends Seeder
             Setting::FEE_INDIVIDUAL => '0',
             Setting::FEE_FEDERATION => '0',
             Setting::FEE_CLUB => '0',
-            Setting::REGISTRATION_SESSION_MINUTES => '30',
+            Setting::REGISTRATION_SESSION_MINUTES => '50',
         ];
 
         foreach ($defaults as $key => $value) {

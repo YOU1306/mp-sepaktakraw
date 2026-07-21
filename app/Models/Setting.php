@@ -34,6 +34,6 @@ class Setting extends Model
 
     public static function sessionMinutes(): int
     {
-        return (int) static::get(self::REGISTRATION_SESSION_MINUTES, 30);
+        return (int) static::get(self::REGISTRATION_SESSION_MINUTES, 50);
     }
 }

@@ -3,7 +3,7 @@
 @section('title', 'Change Password')
 
 @section('content')
-    <h1 class="text-2xl font-bold text-emerald-900 mb-2">Change your password</h1>
+    <h1 class="text-2xl font-bold text-stone-900 mb-2">Change your password</h1>
     <p class="text-sm text-stone-600 mb-6">For security, please set a new password before continuing.</p>
 
     @if ($errors->any())

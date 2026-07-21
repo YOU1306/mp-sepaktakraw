@@ -3,7 +3,7 @@
 @section('title', $title.' — '.config('app.name'))
 
 @section('content')
-    <h1 class="text-2xl font-bold text-emerald-900 mb-6">{{ $title }}</h1>
+    <h1 class="text-2xl font-bold text-stone-900 mb-6">{{ $title }}</h1>
 
     <div class="space-y-4">
         @forelse($items as $item)

@@ -3,11 +3,67 @@
 @section('title', 'Home — '.config('app.name'))
 
 @section('content')
-    <section class="mb-10 rounded-xl overflow-hidden bg-gradient-to-r from-emerald-800 to-emerald-600 text-white p-8 md:p-12">
-        <h1 class="text-3xl md:text-4xl font-bold mb-3">Madhya Pradesh Sepaktakraw Federation</h1>
-        <p class="text-emerald-100 max-w-2xl text-lg">
-            Official portal for news, notices, results, and player registrations across all districts of Madhya Pradesh.
-        </p>
+    <section class="relative mb-10 rounded-xl overflow-hidden text-white p-8 md:p-14 min-h-[320px] flex items-end bg-stone-900"
+        style="background-image: linear-gradient(115deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.72) 40%, rgba(10,10,10,0.3) 100%), url('{{ asset('images/hero-team-honour.png') }}'); background-size: cover; background-position: center;">
+        <div class="relative z-10 max-w-2xl">
+            <span class="inline-block text-[11px] font-semibold uppercase tracking-wider bg-orange-500 px-2.5 py-1 rounded mb-4">
+                Team India &middot; National Honour
+            </span>
+            <h1 class="text-3xl md:text-4xl font-bold mb-3 drop-shadow">Sepaktakraw Association Of Madhya Pradesh</h1>
+            <p class="text-stone-100 text-lg drop-shadow">
+                Official portal for news, notices, results, and player registrations across all districts of Madhya Pradesh.
+            </p>
+        </div>
+        <div class="absolute inset-x-0 bottom-0 h-1.5 flex z-10" aria-hidden="true">
+            <span class="flex-1 bg-orange-500"></span>
+            <span class="flex-1 bg-white"></span>
+            <span class="flex-1 bg-green-700"></span>
+        </div>
+    </section>
+
+    <section class="mb-10">
+        <div class="flex items-center gap-3 mb-5">
+            <span class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                </svg>
+            </span>
+            <div>
+                <h2 class="text-xl font-bold text-stone-900">Our Leadership</h2>
+                <x-tricolour-bar class="w-14 h-1.5 mt-1.5 mb-1" />
+                <p class="text-xs text-stone-500">Office bearers of the state association and its national affiliation</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <figure class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="h-1.5 flex" aria-hidden="true">
+                    <span class="flex-1 bg-orange-500"></span>
+                    <span class="flex-1 bg-white"></span>
+                    <span class="flex-1 bg-green-700"></span>
+                </div>
+                <img src="{{ asset('images/leadership/mp-association-office-bearers.png') }}"
+                     alt="Office bearers of the Sepaktakraw Association of Madhya Pradesh (R): President, Secretary and Joint Secretary"
+                     class="w-full h-auto" loading="lazy">
+                <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
+                    Sepaktakraw Association of Madhya Pradesh (R)
+                </figcaption>
+            </figure>
+
+            <figure class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="h-1.5 flex" aria-hidden="true">
+                    <span class="flex-1 bg-orange-500"></span>
+                    <span class="flex-1 bg-white"></span>
+                    <span class="flex-1 bg-green-700"></span>
+                </div>
+                <img src="{{ asset('images/leadership/sepaktakraw-federation-of-india.png') }}"
+                     alt="Office bearers of the Sepaktakraw Federation of India: President, General Secretary and Treasurer"
+                     class="w-full h-auto" loading="lazy">
+                <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
+                    Affiliated to Sepaktakraw Federation of India
+                </figcaption>
+            </figure>
+        </div>
     </section>
 
     @if($notices->isNotEmpty())
@@ -28,13 +84,14 @@
 
     <div class="grid md:grid-cols-2 gap-8">
         <section>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-emerald-900">News</h2>
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-xl font-bold text-stone-900">News</h2>
                 <a href="{{ route('content.index.news') }}" class="text-sm text-emerald-700 hover:underline">View all</a>
             </div>
+            <x-tricolour-bar class="w-14 h-1.5 mb-4" />
             <div class="space-y-4">
                 @forelse($news as $item)
-                    <article class="bg-white border border-stone-200 rounded-lg p-4 shadow-sm">
+                    <article class="bg-white border border-stone-200 border-l-4 border-l-green-700 rounded-lg p-4 shadow-sm">
                         <h3 class="font-semibold">
                             <a href="{{ route('content.show', ['type' => 'news', 'content' => $item->slug]) }}" class="hover:text-emerald-700">
                                 {{ $item->title }}
@@ -49,15 +106,16 @@
         </section>
 
         <section>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-emerald-900">Events</h2>
-                <a href="{{ route('content.index.events') }}" class="text-sm text-emerald-700 hover:underline">View all</a>
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-xl font-bold text-stone-900">Events</h2>
+                <a href="{{ route('content.index.events') }}" class="text-sm text-orange-700 hover:underline">View all</a>
             </div>
+            <x-tricolour-bar class="w-14 h-1.5 mb-4" />
             <div class="space-y-4">
                 @forelse($events as $item)
-                    <article class="bg-white border border-stone-200 rounded-lg p-4 shadow-sm">
+                    <article class="bg-white border border-stone-200 border-l-4 border-l-orange-500 rounded-lg p-4 shadow-sm">
                         <h3 class="font-semibold">
-                            <a href="{{ route('content.show', ['type' => 'events', 'content' => $item->slug]) }}" class="hover:text-emerald-700">
+                            <a href="{{ route('content.show', ['type' => 'events', 'content' => $item->slug]) }}" class="hover:text-orange-700">
                                 {{ $item->title }}
                             </a>
                         </h3>
@@ -72,15 +130,23 @@
 
     @if($openIntakes->isNotEmpty())
         <section class="mt-10">
-            <h2 class="text-xl font-bold text-emerald-900 mb-4">Open Registrations</h2>
+            <h2 class="text-xl font-bold text-stone-900">Open Registrations</h2>
+            <x-tricolour-bar class="w-14 h-1.5 mt-1.5 mb-4" />
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($openIntakes as $intake)
-                    <div class="bg-white border border-emerald-200 rounded-lg p-4">
-                        <h3 class="font-semibold">{{ $intake->title }}</h3>
-                        @if($intake->district)
-                            <p class="text-sm text-stone-600 mt-1">{{ $intake->district->name }}</p>
-                        @endif
-                        <p class="text-sm font-medium text-emerald-800 mt-2">Fee: ₹{{ $intake->feeInRupees() }}</p>
+                    <div class="bg-white border border-stone-200 rounded-lg overflow-hidden">
+                        <div class="h-1.5 flex" aria-hidden="true">
+                            <span class="flex-1 bg-orange-500"></span>
+                            <span class="flex-1 bg-white"></span>
+                            <span class="flex-1 bg-green-700"></span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold">{{ $intake->title }}</h3>
+                            @if($intake->district)
+                                <p class="text-sm text-stone-600 mt-1">{{ $intake->district->name }}</p>
+                            @endif
+                            <p class="text-sm font-medium text-emerald-800 mt-2">Fee: ₹{{ $intake->feeInRupees() }}</p>
+                        </div>
                     </div>
                 @endforeach
             </div>

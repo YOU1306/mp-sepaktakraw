@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Registration extends Model
 {
@@ -51,8 +51,8 @@ class Registration extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
-    public function payment(): HasOne
+    public function payment(): MorphOne
     {
-        return $this->hasOne(Payment::class);
+        return $this->morphOne(Payment::class, 'payable');
     }
 }

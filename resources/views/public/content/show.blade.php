@@ -8,7 +8,7 @@
             <a href="{{ route('content.index.'.$type) }}" class="hover:underline capitalize">{{ $type }}</a>
             · {{ $content->published_at?->format('d M Y') }}
         </p>
-        <h1 class="text-3xl font-bold text-emerald-900 mb-6">{{ $content->title }}</h1>
+        <h1 class="text-3xl font-bold text-stone-900 mb-6">{{ $content->title }}</h1>
         <div class="prose prose-stone max-w-none">
             {!! $content->body !!}
         </div>

@@ -10,14 +10,14 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->nullableMorphs('payable'); // registration, federation/club application
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->unsignedInteger('amount');
             $table->string('currency', 3)->default('INR');
             $table->string('gateway_order_id')->unique();
             $table->string('gateway_payment_id')->nullable();
             $table->string('gateway_signature')->nullable();
-            $table->string('status')->default('created');
+            $table->string('status')->default('created'); // created, paid, failed, refunded
             $table->timestamps();
         });
     }

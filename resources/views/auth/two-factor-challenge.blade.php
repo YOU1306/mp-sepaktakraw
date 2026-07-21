@@ -3,7 +3,7 @@
 @section('title', 'Two-Factor Authentication')
 
 @section('content')
-    <h1 class="text-2xl font-bold text-emerald-900 mb-2">Two-factor code</h1>
+    <h1 class="text-2xl font-bold text-stone-900 mb-2">Two-factor code</h1>
     <p class="text-sm text-stone-600 mb-6">Enter the code from your authenticator app.</p>
 
     @if ($errors->any())

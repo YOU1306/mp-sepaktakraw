@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Payment extends Model
 {
@@ -13,7 +14,8 @@ class Payment extends Model
     public const STATUS_REFUNDED = 'refunded';
 
     protected $fillable = [
-        'registration_id',
+        'payable_type',
+        'payable_id',
         'user_id',
         'amount',
         'currency',
@@ -30,9 +32,9 @@ class Payment extends Model
         ];
     }
 
-    public function registration(): BelongsTo
+    public function payable(): MorphTo
     {
-        return $this->belongsTo(Registration::class);
+        return $this->morphTo();
     }
 
     public function user(): BelongsTo
