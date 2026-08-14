@@ -9,8 +9,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Payment extends Model
 {
     public const STATUS_CREATED = 'created';
+
     public const STATUS_PAID = 'paid';
+
     public const STATUS_FAILED = 'failed';
+
     public const STATUS_REFUNDED = 'refunded';
 
     protected $fillable = [
@@ -18,6 +21,7 @@ class Payment extends Model
         'payable_id',
         'user_id',
         'amount',
+        'billing_period',
         'currency',
         'gateway_order_id',
         'gateway_payment_id',

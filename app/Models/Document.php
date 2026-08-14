@@ -9,9 +9,13 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Document extends Model
 {
     public const KIND_AADHAAR = 'aadhaar';
+
     public const KIND_PHOTO = 'photo';
+
     public const KIND_MARKSHEET = 'marksheet';
+
     public const KIND_BIRTH_CERTIFICATE = 'birth_certificate';
+
     public const KIND_ACKNOWLEDGEMENT = 'acknowledgement';
 
     protected $fillable = [

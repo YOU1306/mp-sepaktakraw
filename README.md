@@ -63,13 +63,30 @@ auto-deploy, backups, going-live checklist) is documented in
 
 **Known gap before enabling real fees:** Razorpay integration is currently a
 test-mode stub (see `docs/DEPLOYMENT.md` §6) — Checkout.js widget, signature
-verification, and the webhook route still need to be built. Federation/Club
-fees default to ₹0 so this doesn't block launching the public site,
-registrations, and admin/approval workflows.
+verification, and the webhook route still need to be built. Individual and
+Federation registrations both carry a real fee (quarterly/half-yearly/yearly),
+so this should be finished before go-live — until then, test-mode "payments"
+complete the workflow locally without a live gateway.
+
+**Other known gaps:**
+- **SMS (MSG91):** wired via `SmsService`/`OtpService`, but falls back to a
+  test-mode stub (code logged, and returned in the API response for local
+  testing) until `MSG91_AUTH_KEY` is set in `.env`.
+- **Aadhaar offline e-KYC:** `AadhaarOfflineKycService` parses and extracts
+  data from the uploaded Offline e-KYC ZIP/XML immediately. Cryptographic
+  signature verification against UIDAI's certificate only activates once the
+  certificate file is placed at `AADHAAR_UIDAI_CERT_PATH` — until then,
+  applications are flagged "not verified — manual check required" for the
+  district federation reviewer.
 
 ## Status
-Public site, auth/RBAC, admin panel, and individual/federation/club
-registration flows (with document uploads and a government-portal-style,
-tricolour-themed UI) are built and tested locally (14 passing tests). Next:
-finish the real Razorpay gateway integration, then follow
+Public site, auth/RBAC, admin panel, and individual/federation registration
+flows (Club registration has been removed — a Club's former responsibilities
+now sit with the District Federation / Admin / Super Admin) are built and
+tested locally (18 passing tests). Individual registration covers
+Player/Team Manager/Coach/Referee/Scorer/Official in one flow, with phone +
+email OTP verification, offline Aadhaar e-KYC, and quarterly/half-yearly/
+yearly billing with automatic reminders + access lockout on missed renewal.
+Next: finish the real Razorpay gateway integration, add live MSG91 +
+UIDAI certificate credentials, then follow
 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) to go live.

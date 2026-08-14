@@ -1,15 +1,16 @@
 <?php
 
-use App\Http\Controllers\ClubRegistrationController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FederationRegistrationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IndividualRegistrationController;
+use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\VerificationController;
 use App\Models\Content;
 use Illuminate\Support\Facades\Route;
 
@@ -20,7 +21,7 @@ Route::get('/notices', fn () => app(ContentController::class)->index('notices'))
 Route::get('/results', fn () => app(ContentController::class)->index('results'))->name('content.index.results');
 Route::get('/events', fn () => app(ContentController::class)->index('events'))->name('content.index.events');
 
-// Registration landing (individual / federation / club flows added per phase)
+// Registration landing (individual / federation flows)
 Route::get('/register', [RegistrationController::class, 'index'])->name('register');
 
 Route::prefix('register')->name('register.')->group(function () {
@@ -32,9 +33,8 @@ Route::prefix('register')->name('register.')->group(function () {
     Route::post('/federation', [FederationRegistrationController::class, 'store'])->name('federation.store');
     Route::get('/federation/success', [FederationRegistrationController::class, 'success'])->name('federation.success');
 
-    Route::get('/club', [ClubRegistrationController::class, 'create'])->name('club');
-    Route::post('/club', [ClubRegistrationController::class, 'store'])->name('club.store');
-    Route::get('/club/success', [ClubRegistrationController::class, 'success'])->name('club.success');
+    Route::post('/otp/send', [VerificationController::class, 'send'])->name('otp.send');
+    Route::post('/otp/verify', [VerificationController::class, 'verify'])->name('otp.verify');
 
     Route::get('/payment/{reference}', [PaymentController::class, 'show'])->name('payment');
     Route::post('/payment/{reference}', [PaymentController::class, 'process'])->name('payment.process');
@@ -45,6 +45,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/password/change', [PasswordChangeController::class, 'edit'])->name('password.change');
     Route::post('/password/change', [PasswordChangeController::class, 'update'])->name('password.change.update');
+
+    Route::get('/membership/renew', [MembershipController::class, 'show'])->name('membership.renew');
+    Route::post('/membership/renew', [MembershipController::class, 'process'])->name('membership.renew.process');
+
+    Route::post('/notifications/{notification}/read', [DashboardController::class, 'markNotificationRead'])->name('notifications.read');
 
     Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
 });

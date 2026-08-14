@@ -12,14 +12,19 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class RegistrationApplication extends Model
 {
     public const TYPE_INDIVIDUAL = 'individual';
+
     public const TYPE_FEDERATION = 'federation';
-    public const TYPE_CLUB = 'club';
 
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_PENDING_PAYMENT = 'pending_payment';
+
     public const STATUS_UNDER_REVIEW = 'under_review';
+
     public const STATUS_APPROVED = 'approved';
+
     public const STATUS_REJECTED = 'rejected';
+
     public const STATUS_EXPIRED = 'expired';
 
     protected $fillable = [
@@ -28,7 +33,9 @@ class RegistrationApplication extends Model
         'status',
         'applicant_name',
         'applicant_email',
+        'applicant_phone',
         'district_id',
+        'billing_period',
         'reviewed_by',
         'review_note',
         'reviewed_at',
@@ -61,11 +68,6 @@ class RegistrationApplication extends Model
         return $this->hasOne(Federation::class, 'application_id');
     }
 
-    public function club(): HasOne
-    {
-        return $this->hasOne(Club::class, 'application_id');
-    }
-
     public function officeBearers(): HasMany
     {
         return $this->hasMany(OfficeBearer::class, 'application_id');
@@ -82,9 +84,14 @@ class RegistrationApplication extends Model
         return $this->morphMany(Document::class, 'documentable');
     }
 
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'payable');
+    }
+
     public function payment(): MorphOne
     {
-        return $this->morphOne(Payment::class, 'payable');
+        return $this->morphOne(Payment::class, 'payable')->latestOfMany();
     }
 
     public function district(): BelongsTo
@@ -112,7 +119,6 @@ class RegistrationApplication extends Model
         $prefix = match ($type) {
             self::TYPE_INDIVIDUAL => 'IND',
             self::TYPE_FEDERATION => 'FED',
-            self::TYPE_CLUB => 'CLB',
             default => 'APP',
         };
 

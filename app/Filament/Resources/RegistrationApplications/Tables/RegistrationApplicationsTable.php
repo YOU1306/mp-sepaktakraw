@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\RegistrationApplications\Tables;
 
-use App\Models\Player;
 use App\Models\RegistrationApplication;
 use App\Services\RegistrationReviewService;
 use Filament\Actions\Action;
@@ -25,6 +24,21 @@ class RegistrationApplicationsTable
                 TextColumn::make('type')->badge()->formatStateUsing(fn (string $state) => ucfirst($state)),
                 TextColumn::make('applicant_name')->label('Applicant')->searchable(),
                 TextColumn::make('applicant_email')->label('Email')->searchable()->toggleable(),
+                TextColumn::make('district.name')->label('District')->toggleable(),
+                TextColumn::make('billing_period')->label('Period')->formatStateUsing(fn (?string $s) => $s ? ucwords(str_replace('_', ' ', $s)) : '-')->toggleable(),
+                TextColumn::make('player.aadhaar_identity_match')
+                    ->label('ID match')
+                    ->formatStateUsing(fn (?bool $state) => match ($state) {
+                        true => '✓ Match',
+                        false => '⚠ Mismatch',
+                        default => '—',
+                    })
+                    ->color(fn (?bool $state) => match ($state) {
+                        true => 'success',
+                        false => 'danger',
+                        default => 'gray',
+                    })
+                    ->toggleable(),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state) => match ($state) {
@@ -41,7 +55,6 @@ class RegistrationApplicationsTable
                 SelectFilter::make('type')->options([
                     RegistrationApplication::TYPE_INDIVIDUAL => 'Individual',
                     RegistrationApplication::TYPE_FEDERATION => 'Federation',
-                    RegistrationApplication::TYPE_CLUB => 'Club',
                 ]),
                 SelectFilter::make('status')
                     ->options([
@@ -71,11 +84,12 @@ class RegistrationApplicationsTable
                                 TextEntry::make('district.name')->label('District'),
                                 TextEntry::make('submitted_at')->dateTime('d M Y, H:i'),
                             ]),
-                        Section::make('Player')
+                        Section::make('Registrant')
                             ->visible(fn (RegistrationApplication $r) => $r->type === RegistrationApplication::TYPE_INDIVIDUAL)
                             ->columns(2)
                             ->schema([
                                 TextEntry::make('player.name')->label('Name'),
+                                TextEntry::make('player.member_role')->label('Registered as')->formatStateUsing(fn ($s, $record) => $record->player?->memberRoleLabel() ?? '-'),
                                 TextEntry::make('player.category')->label('Category')->formatStateUsing(fn ($s) => $s ? ucwords(str_replace('_', ' ', $s)) : '-'),
                                 TextEntry::make('player.father_name')->label("Father's name"),
                                 TextEntry::make('player.mother_name')->label("Mother's name"),
@@ -84,26 +98,22 @@ class RegistrationApplicationsTable
                                 TextEntry::make('player.email')->label('Email'),
                                 TextEntry::make('player.contact_number')->label('Contact'),
                                 TextEntry::make('player.address')->label('Address')->columnSpanFull(),
+                                TextEntry::make('aadhaar_kyc')->label('Aadhaar offline e-KYC')->columnSpanFull()
+                                    ->state(fn (RegistrationApplication $r) => self::aadhaarKycSummary($r))->html(),
                                 TextEntry::make('player_docs')->hiddenLabel()->columnSpanFull()
                                     ->state(fn (RegistrationApplication $r) => self::documentLinks($r->player?->documents))->html(),
                             ]),
                         Section::make('Organisation')
-                            ->visible(fn (RegistrationApplication $r) => in_array($r->type, [RegistrationApplication::TYPE_FEDERATION, RegistrationApplication::TYPE_CLUB], true))
+                            ->visible(fn (RegistrationApplication $r) => $r->type === RegistrationApplication::TYPE_FEDERATION)
                             ->schema([
                                 TextEntry::make('org')->hiddenLabel()
                                     ->state(fn (RegistrationApplication $r) => self::organisationSummary($r))->html(),
                             ]),
                         Section::make('Office Bearers')
-                            ->visible(fn (RegistrationApplication $r) => in_array($r->type, [RegistrationApplication::TYPE_FEDERATION, RegistrationApplication::TYPE_CLUB], true))
+                            ->visible(fn (RegistrationApplication $r) => $r->type === RegistrationApplication::TYPE_FEDERATION)
                             ->schema([
                                 TextEntry::make('bearers')->hiddenLabel()
                                     ->state(fn (RegistrationApplication $r) => self::officeBearersTable($r))->html(),
-                            ]),
-                        Section::make('Members')
-                            ->visible(fn (RegistrationApplication $r) => $r->type === RegistrationApplication::TYPE_CLUB)
-                            ->schema([
-                                TextEntry::make('members_list')->hiddenLabel()
-                                    ->state(fn (RegistrationApplication $r) => self::membersTable($r))->html(),
                             ]),
                     ])),
                 Action::make('approve')
@@ -153,14 +163,32 @@ class RegistrationApplicationsTable
                 .'<div><strong>Acknowledgement:</strong> '.$ack.'</div></div>';
         }
 
-        if ($r->type === RegistrationApplication::TYPE_CLUB && $r->club) {
-            return '<div class="space-y-1">'
-                .'<div><strong>Club:</strong> '.e($r->club->club_name).'</div>'
-                .'<div><strong>Registration No:</strong> '.e($r->club->registration_number).'</div>'
-                .'<div><strong>Place:</strong> '.e($r->club->place).'</div></div>';
+        return '<span class="text-gray-500">No details.</span>';
+    }
+
+    protected static function aadhaarKycSummary(RegistrationApplication $r): string
+    {
+        $player = $r->player;
+        if (! $player) {
+            return '<span class="text-gray-500">-</span>';
         }
 
-        return '<span class="text-gray-500">No details.</span>';
+        $badge = $player->aadhaar_verified
+            ? '<span class="text-green-700 font-medium">✓ Digitally verified</span>'
+            : '<span class="text-amber-700 font-medium">⚠ Not verified — manual check required</span>';
+
+        $identityBadge = match ($player->aadhaar_identity_match) {
+            true => '<span class="text-green-700 font-medium ml-3">✓ Name &amp; DOB match the form</span>',
+            false => '<span class="text-red-700 font-medium ml-3">⚠ Name/DOB mismatch — verify manually</span>',
+            default => '',
+        };
+
+        $note = $player->aadhaar_kyc_note ? '<div class="text-gray-500 mt-1">'.e($player->aadhaar_kyc_note).'</div>' : '';
+        $extracted = collect($player->aadhaar_kyc_data ?? [])
+            ->map(fn ($v, $k) => '<strong>'.e(ucfirst(str_replace('_', ' ', $k))).':</strong> '.e($v))
+            ->implode(' &nbsp;|&nbsp; ');
+
+        return '<div>'.$badge.$identityBadge.$note.($extracted ? '<div class="text-gray-600 mt-1">'.$extracted.'</div>' : '').'</div>';
     }
 
     protected static function officeBearersTable(RegistrationApplication $r): string
@@ -181,29 +209,6 @@ class RegistrationApplicationsTable
 
         return '<table class="w-full text-sm"><thead><tr class="text-left text-gray-500 border-b border-gray-200">'
             .'<th class="py-1 pr-3">Name</th><th class="py-1 pr-3">Designation</th><th class="py-1 pr-3">Contact</th><th class="py-1 pr-3">Email</th><th class="py-1">Aadhaar</th>'
-            .'</tr></thead><tbody>'.$rows.'</tbody></table>';
-    }
-
-    protected static function membersTable(RegistrationApplication $r): string
-    {
-        $members = $r->members;
-        if ($members->isEmpty()) {
-            return '<span class="text-gray-500">None.</span>';
-        }
-
-        $rows = $members->map(function (Player $m) {
-            $cat = $m->category ? ucwords(str_replace('_', ' ', $m->category)) : '-';
-
-            return '<tr class="border-b border-gray-100">'
-                .'<td class="py-1 pr-3">'.e($m->name).'</td>'
-                .'<td class="py-1 pr-3">'.e($m->memberRoleLabel()).'</td>'
-                .'<td class="py-1 pr-3">'.e($cat).'</td>'
-                .'<td class="py-1 pr-3">'.e($m->contact_number).'</td>'
-                .'<td class="py-1">'.self::documentLinks($m->documents).'</td></tr>';
-        })->implode('');
-
-        return '<table class="w-full text-sm"><thead><tr class="text-left text-gray-500 border-b border-gray-200">'
-            .'<th class="py-1 pr-3">Name</th><th class="py-1 pr-3">Role</th><th class="py-1 pr-3">Category</th><th class="py-1 pr-3">Contact</th><th class="py-1">Documents</th>'
             .'</tr></thead><tbody>'.$rows.'</tbody></table>';
     }
 }

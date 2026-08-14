@@ -12,12 +12,15 @@
         <div class="rounded-b-xl bg-white border border-t-0 border-stone-200 shadow-sm px-6 py-7">
             <div class="flex items-baseline justify-between border-b border-stone-100 pb-4 mb-4">
                 <span class="text-stone-600">Amount payable</span>
-                <span class="text-2xl font-bold text-emerald-900">₹{{ number_format($payment->amount / 100, 2) }}</span>
+                <span class="text-2xl font-bold text-emerald-900">₹{{ number_format($payment->amount, 2) }}</span>
             </div>
 
             <dl class="text-sm space-y-2 mb-6">
                 <div class="flex justify-between"><dt class="text-stone-500">Applicant</dt><dd class="text-stone-800 font-medium">{{ $application->applicant_name }}</dd></div>
                 <div class="flex justify-between"><dt class="text-stone-500">Type</dt><dd class="text-stone-800 font-medium">{{ ucfirst($application->type) }}</dd></div>
+                @if ($application->billing_period)
+                    <div class="flex justify-between"><dt class="text-stone-500">Billing period</dt><dd class="text-stone-800 font-medium">{{ \App\Models\Setting::PERIODS[$application->billing_period] ?? ucfirst($application->billing_period) }}</dd></div>
+                @endif
             </dl>
 
             @if ($deadline)
@@ -32,12 +35,12 @@
                 @if ($testMode)
                     <p class="text-xs text-stone-500 mb-3 text-center">Payment gateway is in <strong>test mode</strong> (no live keys configured). Click below to simulate a successful payment.</p>
                     <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg shadow-sm">
-                        Pay ₹{{ number_format($payment->amount / 100, 2) }} (Test Mode)
+                        Pay ₹{{ number_format($payment->amount, 2) }} (Test Mode)
                     </button>
                 @else
                     <p class="text-xs text-stone-500 mb-3 text-center">You will be redirected to the secure Razorpay gateway.</p>
                     <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg shadow-sm">
-                        Pay ₹{{ number_format($payment->amount / 100, 2) }}
+                        Pay ₹{{ number_format($payment->amount, 2) }}
                     </button>
                 @endif
             </form>

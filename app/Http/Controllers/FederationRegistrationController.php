@@ -7,6 +7,7 @@ use App\Models\District;
 use App\Models\Document;
 use App\Models\OfficeBearer;
 use App\Models\RegistrationApplication;
+use App\Models\Setting;
 use App\Services\AuditService;
 use App\Services\DocumentService;
 use App\Services\PaymentService;
@@ -24,7 +25,8 @@ class FederationRegistrationController extends Controller
         return view('registration.federation', [
             'districts' => District::query()->orderBy('name')->get(),
             'designations' => OfficeBearer::DESIGNATIONS,
-            'fee' => PaymentService::feeForType(RegistrationApplication::TYPE_FEDERATION),
+            'periods' => Setting::PERIODS,
+            'fees' => Setting::feesForType('federation'),
         ]);
     }
 
@@ -33,6 +35,7 @@ class FederationRegistrationController extends Controller
         $validator = validator($request->all(), array_merge([
             'registration_number' => ['required', 'string', 'max:255'],
             'district_id' => ['required', 'exists:districts,id'],
+            'billing_period' => ['required', 'in:'.implode(',', array_keys(Setting::PERIODS))],
             'acknowledgement' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ], $this->officeBearerRules()), $this->officeBearerMessages());
 
@@ -44,7 +47,7 @@ class FederationRegistrationController extends Controller
 
         $district = District::find($validated['district_id']);
         $bearers = $validated['office_bearers'];
-        $fee = PaymentService::feeForType(RegistrationApplication::TYPE_FEDERATION);
+        $fee = PaymentService::feeForPeriod('federation', $validated['billing_period']);
 
         $application = DB::transaction(function () use ($request, $validated, $district, $bearers, $fee) {
             $application = RegistrationApplication::create([
@@ -55,7 +58,9 @@ class FederationRegistrationController extends Controller
                     : RegistrationApplication::STATUS_UNDER_REVIEW,
                 'applicant_name' => $district->name.' District Federation',
                 'applicant_email' => $this->secretaryEmail($bearers),
+                'applicant_phone' => collect($bearers)->firstWhere('designation', OfficeBearer::DESIGNATION_SECRETARY)['contact'] ?? null,
                 'district_id' => $district->id,
+                'billing_period' => $validated['billing_period'],
                 'submitted_at' => $fee > 0 ? null : now(),
                 'expires_at' => $fee > 0 ? now()->addMinutes(PaymentService::windowMinutes()) : null,
             ]);
@@ -70,7 +75,7 @@ class FederationRegistrationController extends Controller
             $this->persistOfficeBearers($request, $application, $bearers);
 
             if ($fee > 0) {
-                PaymentService::createOrder($application, $fee);
+                PaymentService::createOrder($application, $fee, $validated['billing_period']);
             }
 
             AuditService::logModel('submitted', $application, ['fee' => $fee]);

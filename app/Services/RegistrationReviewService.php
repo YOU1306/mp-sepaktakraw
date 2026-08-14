@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Mail\RegistrationApprovedMail;
 use App\Mail\RegistrationRejectedMail;
 use App\Models\RegistrationApplication;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -21,7 +22,6 @@ class RegistrationReviewService
         return match ($applicationType) {
             RegistrationApplication::TYPE_INDIVIDUAL => ['role' => 'user', 'type' => 'user'],
             RegistrationApplication::TYPE_FEDERATION => ['role' => 'super-user', 'type' => 'super-user'],
-            RegistrationApplication::TYPE_CLUB => ['role' => 'club', 'type' => 'club'],
             default => ['role' => 'user', 'type' => 'user'],
         };
     }
@@ -30,14 +30,18 @@ class RegistrationReviewService
     {
         return DB::transaction(function () use ($application, $reviewer) {
             $map = self::roleFor($application->type);
+            $period = $application->billing_period ?? Setting::PERIOD_QUARTERLY;
 
             $credentials = CredentialService::createAccount(
                 role: $map['role'],
                 attributes: [
                     'name' => $application->applicant_name,
                     'email' => $application->applicant_email,
+                    'phone' => $application->applicant_phone,
                     'district_id' => $application->district_id,
                     'email_verified_at' => now(),
+                    'membership_period' => $period,
+                    'membership_expires_at' => now()->addMonths(Setting::periodMonths($period)),
                 ],
                 type: $map['type'],
             );
@@ -64,6 +68,13 @@ class RegistrationReviewService
                 );
             }
 
+            if ($application->applicant_phone) {
+                SmsService::send(
+                    $application->applicant_phone,
+                    "Your MP Sepaktakraw registration ({$application->reference_no}) is approved. User ID: {$credentials['user_id']}. Check your email for the password."
+                );
+            }
+
             return $credentials;
         });
     }
@@ -82,6 +93,13 @@ class RegistrationReviewService
         if ($application->applicant_email) {
             Mail::to($application->applicant_email)->send(
                 new RegistrationRejectedMail($application, $reason)
+            );
+        }
+
+        if ($application->applicant_phone) {
+            SmsService::send(
+                $application->applicant_phone,
+                "Your MP Sepaktakraw registration ({$application->reference_no}) was not approved. Please submit a new request. Check your email for details."
             );
         }
     }

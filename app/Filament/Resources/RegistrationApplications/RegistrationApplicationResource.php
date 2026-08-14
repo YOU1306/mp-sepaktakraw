@@ -9,6 +9,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RegistrationApplicationResource extends Resource
 {
@@ -25,9 +26,28 @@ class RegistrationApplicationResource extends Resource
         return RegistrationApplicationsTable::configure($table);
     }
 
+    /**
+     * Admin / Super Admin see everything. A District Federation (Super User)
+     * only sees individual/official applications submitted in their own
+     * district — the review responsibility a Club used to share.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if ($user?->isSuperUser()) {
+            return $query
+                ->where('type', RegistrationApplication::TYPE_INDIVIDUAL)
+                ->where('district_id', $user->district_id);
+        }
+
+        return $query;
+    }
+
     public static function canViewAny(): bool
     {
-        return auth()->user()?->hasAnyRole(['admin', 'super-admin']) ?? false;
+        return auth()->user()?->hasAnyRole(['admin', 'super-admin', 'super-user']) ?? false;
     }
 
     public static function canCreate(): bool

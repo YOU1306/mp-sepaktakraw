@@ -10,12 +10,17 @@ use Illuminate\Support\Str;
 class Content extends Model
 {
     public const TYPE_NEWS = 'news';
+
     public const TYPE_NOTICE = 'notice';
+
     public const TYPE_RESULT = 'result';
+
     public const TYPE_EVENT = 'event';
+
     public const TYPE_PAGE = 'page';
 
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_PUBLISHED = 'published';
 
     protected $fillable = [

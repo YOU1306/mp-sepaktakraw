@@ -9,18 +9,27 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Player extends Model
 {
     public const CATEGORY_SUB_JUNIOR = 'sub_junior';
+
     public const CATEGORY_JUNIOR = 'junior';
+
     public const CATEGORY_SENIOR = 'senior';
 
     public const SEX_MALE = 'male';
+
     public const SEX_FEMALE = 'female';
+
     public const SEX_OTHER = 'other';
 
     public const ROLE_PLAYER = 'player';
+
     public const ROLE_TEAM_MANAGER = 'team_manager';
+
     public const ROLE_COACH = 'coach';
+
     public const ROLE_REFEREE = 'referee';
+
     public const ROLE_SCORER = 'scorer';
+
     public const ROLE_OFFICIAL = 'official';
 
     public const CATEGORIES = [
@@ -47,7 +56,6 @@ class Player extends Model
     protected $fillable = [
         'application_id',
         'user_id',
-        'club_id',
         'member_role',
         'category',
         'name',
@@ -58,12 +66,20 @@ class Player extends Model
         'email',
         'contact_number',
         'address',
+        'aadhaar_verified',
+        'aadhaar_number_masked',
+        'aadhaar_kyc_data',
+        'aadhaar_kyc_note',
+        'aadhaar_identity_match',
     ];
 
     protected function casts(): array
     {
         return [
             'dob' => 'date',
+            'aadhaar_verified' => 'boolean',
+            'aadhaar_kyc_data' => 'array',
+            'aadhaar_identity_match' => 'boolean',
         ];
     }
 
@@ -75,11 +91,6 @@ class Player extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function club(): BelongsTo
-    {
-        return $this->belongsTo(Club::class);
     }
 
     public function documents(): MorphMany

@@ -78,9 +78,8 @@
                             </svg>
                         </a>
                         <div class="absolute left-0 top-full hidden group-hover:block bg-white text-stone-800 rounded-b-md shadow-lg border border-stone-200 w-56 py-1.5">
-                            <a href="{{ route('register.individual') }}" class="block px-4 py-2 text-sm hover:bg-emerald-50">Individual Player</a>
+                            <a href="{{ route('register.individual') }}" class="block px-4 py-2 text-sm hover:bg-emerald-50">Individual Registration</a>
                             <a href="{{ route('register.federation') }}" class="block px-4 py-2 text-sm hover:bg-emerald-50">District Federation</a>
-                            <a href="{{ route('register.club') }}" class="block px-4 py-2 text-sm hover:bg-emerald-50">Club</a>
                         </div>
                     </div>
                 </div>
@@ -111,7 +110,7 @@
             <div>
                 <h3 class="text-white font-semibold mb-3">About</h3>
                 <p class="text-stone-400 leading-relaxed">
-                    Official portal of the Madhya Pradesh Sepaktakraw Federation for player, federation and club
+                    Official portal of the Madhya Pradesh Sepaktakraw Federation for individual and district federation
                     registration, and for publishing news, notices, results and events across all districts.
                 </p>
             </div>
@@ -128,9 +127,8 @@
             <div>
                 <h3 class="text-white font-semibold mb-3">Registration</h3>
                 <ul class="space-y-1.5">
-                    <li><a href="{{ route('register.individual') }}" class="hover:text-white hover:underline">Individual Player</a></li>
+                    <li><a href="{{ route('register.individual') }}" class="hover:text-white hover:underline">Individual Registration</a></li>
                     <li><a href="{{ route('register.federation') }}" class="hover:text-white hover:underline">District Federation</a></li>
-                    <li><a href="{{ route('register.club') }}" class="hover:text-white hover:underline">Club</a></li>
                     <li><a href="{{ route('login') }}" class="hover:text-white hover:underline">Login</a></li>
                 </ul>
             </div>

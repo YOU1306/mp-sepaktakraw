@@ -15,7 +15,7 @@ class DemoContentSeeder extends Seeder
         if (! $author) {
             return;
         }
-        
+
         $items = [
             [
                 'type' => Content::TYPE_NEWS,

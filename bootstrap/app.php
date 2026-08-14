@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureMembershipActive;
+use App\Http\Middleware\EnsurePasswordChanged;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\EnsurePasswordChanged::class,
+            EnsurePasswordChanged::class,
+            EnsureMembershipActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

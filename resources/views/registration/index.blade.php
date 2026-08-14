@@ -10,17 +10,17 @@
                 verified by the federation admin. Once approved, login credentials (User ID and password) are issued by email.</p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-6">
+        <div class="grid md:grid-cols-2 gap-6">
             {{-- Individual --}}
             <a href="{{ route('register.individual') }}" class="group block bg-white border border-stone-200 rounded-xl overflow-hidden hover:border-emerald-500 hover:shadow-md transition">
                 <div class="h-1.5 bg-emerald-600"></div>
                 <div class="p-6 flex flex-col h-full">
                     <div class="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-4">&#9823;</div>
-                    <h2 class="font-bold text-stone-900 text-lg">Individual Player</h2>
-                    <p class="text-sm text-stone-600 mt-2 flex-1">For individual players (Sub-junior / Junior / Senior). Submit your
-                        details and documents.</p>
+                    <h2 class="font-bold text-stone-900 text-lg">Individual Registration</h2>
+                    <p class="text-sm text-stone-600 mt-2 flex-1">Register as a Player, Team Manager, Coach, Referee, Scorer or Official.
+                        Quarterly / half-yearly / yearly fee, reviewed by your district federation.</p>
                     <div class="mt-4 flex items-center justify-between">
-                        <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Free</span>
+                        <span class="text-xs font-medium text-stone-600 bg-stone-100 px-2 py-0.5 rounded">From ₹100</span>
                         <span class="text-sm font-semibold text-orange-600 group-hover:translate-x-0.5 transition">Start &rarr;</span>
                     </div>
                 </div>
@@ -33,24 +33,9 @@
                     <div class="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-4">&#127963;</div>
                     <h2 class="font-bold text-stone-900 text-lg">District Federation</h2>
                     <p class="text-sm text-stone-600 mt-2 flex-1">For district federations with 7–14 office bearers (Secretary
-                        required). Registration fee applies.</p>
+                        required). Quarterly / half-yearly / yearly fee.</p>
                     <div class="mt-4 flex items-center justify-between">
-                        <span class="text-xs font-medium text-stone-600 bg-stone-100 px-2 py-0.5 rounded">Fee + payment</span>
-                        <span class="text-sm font-semibold text-orange-600 group-hover:translate-x-0.5 transition">Start &rarr;</span>
-                    </div>
-                </div>
-            </a>
-
-            {{-- Club --}}
-            <a href="{{ route('register.club') }}" class="group block bg-white border border-stone-200 rounded-xl overflow-hidden hover:border-emerald-500 hover:shadow-md transition">
-                <div class="h-1.5 bg-emerald-600"></div>
-                <div class="p-6 flex flex-col h-full">
-                    <div class="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-4">&#128101;</div>
-                    <h2 class="font-bold text-stone-900 text-lg">Club</h2>
-                    <p class="text-sm text-stone-600 mt-2 flex-1">For clubs with office bearers (7–14) and members (players &
-                        officials). Registration fee applies.</p>
-                    <div class="mt-4 flex items-center justify-between">
-                        <span class="text-xs font-medium text-stone-600 bg-stone-100 px-2 py-0.5 rounded">Fee + payment</span>
+                        <span class="text-xs font-medium text-stone-600 bg-stone-100 px-2 py-0.5 rounded">From ₹500</span>
                         <span class="text-sm font-semibold text-orange-600 group-hover:translate-x-0.5 transition">Start &rarr;</span>
                     </div>
                 </div>

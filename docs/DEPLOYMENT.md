@@ -143,6 +143,46 @@ recommended — 300 free emails/day, good inbox deliverability:
    MAIL_FROM_ADDRESS="noreply@yourdomain.in"
    ```
 
+## 5b. 🧑 Set up SMS OTP (MSG91) and Aadhaar Offline e-KYC verification
+
+Two more external pieces the app now depends on — both required before real
+users can complete registration (phone/email OTP is mandatory on the
+individual registration form):
+
+1. **MSG91 account + DLT registration** (SMS OTP + notifications):
+   - Sign up at [msg91.com](https://msg91.com/).
+   - Complete **DLT registration** (entity + sender ID + templates) — this is
+     a one-time regulatory requirement from TRAI for sending SMS to Indian
+     mobiles, roughly ₹6,000 one-time, handled through MSG91's dashboard.
+     Without it, SMS sending will fail/be blocked once you leave test mode.
+   - Register a 6-character sender ID (the repo defaults to `MPSTKW` in
+     `.env.production.example` — change if already taken).
+   - Get your **Auth Key** from MSG91 → API → Auth Key, put it in `.env`:
+     ```
+     MSG91_AUTH_KEY=<your auth key>
+     MSG91_SENDER_ID=MPSTKW
+     ```
+   - If `MSG91_AUTH_KEY` is left blank, `SmsService` runs in test mode (OTPs
+     are logged, not actually sent) — fine for demoing, not for real users.
+
+2. **Aadhaar Offline e-KYC signature verification**:
+   - Download UIDAI's current public signing certificate from the
+     [UIDAI developer/downloads page](https://uidai.gov.in/) (used to verify
+     the digital signature inside the Aadhaar Offline e-KYC XML/ZIP a user
+     uploads — no OTP or UIDAI API calls needed, it's fully offline).
+   - Place it on the server and point `.env` at it:
+     ```
+     AADHAAR_UIDAI_CERT_PATH=/var/www/mp-sepaktakraw/storage/app/uidai/uidai_offline_kyc_cert.pem
+     ```
+   - If the certificate is missing, `AadhaarOfflineKycService` still extracts
+     the demographic data from the XML but flags the record as "not
+     digitally verified — manual check required", which admins/district
+     federations see in the application review screen. Not a blocker to
+     launch, but upload the cert as soon as possible for real signature
+     verification.
+   - UIDAI rotates this certificate occasionally — re-download and swap it in
+     if verification suddenly starts failing for everyone.
+
 ## 6. ⚠️ Razorpay — current status, read before touching `.env`
 
 **Important — this is a real gap, not just a config step.** Today the code
@@ -252,6 +292,12 @@ entire deploy process.
   server it's backing up isn't a real backup.
 - [ ] Test the password-reset and registration-approval emails actually land
   in an inbox (not spam) — Brevo's dashboard shows delivery status.
+- [ ] Send a real test OTP to your own phone from `/register/individual` and
+  confirm MSG91 DLT registration is approved (SMS silently fails on
+  unregistered DLT templates) — check MSG91's dashboard delivery logs.
+- [ ] Confirm the UIDAI certificate is in place and at least one real Aadhaar
+  Offline e-KYC upload shows "✓ Digitally verified" in the admin review
+  screen (not just "manual check required").
 - [ ] Confirm Federation/Club fees are still **₹0** in Settings until the
   Razorpay Checkout.js + signature verification + webhook work (step 6) is
   done — don't turn on real fees before that.

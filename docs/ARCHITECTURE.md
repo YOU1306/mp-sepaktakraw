@@ -325,15 +325,18 @@ Environments: staging + production (separate DBs, gateway test vs live keys)
 
 | Item | Est. cost |
 |---|---|
-| Single VPS (2 vCPU / 4 GB, incl. MySQL + Redis + app + media) | ₹500 – ₹1,200 |
+| Single VPS (2 vCPU / 4 GB, incl. MySQL + Redis + app + media) | ₹500 – ₹1,200 / mo |
 | Domain (.in / .org.in) | ~₹800 / year |
 | SSL (Let's Encrypt) | Free |
 | Cloudflare (optional) | Free |
-| SMTP relay (optional, or self-host Postfix) | ₹0 – ₹500 |
-| Payment gateway | per-transaction % only (no fixed) |
-| **Total** | **~₹500 – ₹1,700 / month** |
+| SMTP relay (Brevo free tier, 300 emails/day) | ₹0 |
+| SMS OTP + notifications (MSG91, pay-as-you-go, ~₹0.15–0.20/SMS) | ~₹50 – ₹200 / mo (volume-dependent) |
+| SMS DLT registration (one-time, sender ID + templates, regulatory — not annual) | ~₹6,000 one-time |
+| Aadhaar Offline e-KYC verification (UIDAI signing certificate) | Free (public cert) |
+| Payment gateway (Razorpay) | per-transaction % only (no fixed cost) |
+| **Total recurring** | **~₹550 – ₹1,400 / month** (+ ~₹6,000 one-time SMS DLT registration in year 1) |
 
-Almost everything is one VPS bill. No per-service SaaS stacking.
+Almost everything is one VPS bill plus a small, usage-based SMS wallet. No large per-service SaaS stacking.
 
 ---
 

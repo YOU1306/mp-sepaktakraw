@@ -145,7 +145,7 @@ return [
 
     'features' => [
         // Public self-registration is replaced by the custom onboarding flows
-        // (individual / federation / club) under /register.
+        // (individual / federation) under /register.
         Features::resetPasswords(),
         // Features::emailVerification(),
         Features::updateProfileInformation(),

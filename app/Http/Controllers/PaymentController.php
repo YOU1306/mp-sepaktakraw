@@ -78,7 +78,6 @@ class PaymentController extends Controller
     {
         return match ($application->type) {
             RegistrationApplication::TYPE_FEDERATION => 'register.federation.success',
-            RegistrationApplication::TYPE_CLUB => 'register.club.success',
             default => 'register.individual.success',
         };
     }

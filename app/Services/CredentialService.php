@@ -12,7 +12,6 @@ class CredentialService
         'super-admin' => 'SA',
         'admin' => 'AD',
         'super-user' => 'SU',
-        'club' => 'CLB',
         'user' => 'PLR',
     ];
 

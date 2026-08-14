@@ -9,9 +9,13 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class Registration extends Model
 {
     public const STATUS_SUBMITTED = 'submitted';
+
     public const STATUS_PAID = 'paid';
+
     public const STATUS_UNDER_REVIEW = 'under_review';
+
     public const STATUS_APPROVED = 'approved';
+
     public const STATUS_REJECTED = 'rejected';
 
     protected $fillable = [

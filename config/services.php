@@ -40,4 +40,15 @@ return [
         'secret' => env('RAZORPAY_SECRET'),
     ],
 
+    'msg91' => [
+        'auth_key' => env('MSG91_AUTH_KEY'),
+        'sender_id' => env('MSG91_SENDER_ID', 'MPSTKW'),
+    ],
+
+    'aadhaar' => [
+        // Place UIDAI's published Offline-KYC signing certificate (PEM/CER) here.
+        // Until this file exists, uploads are extracted but not cryptographically verified.
+        'certificate_path' => env('AADHAAR_UIDAI_CERT_PATH', storage_path('app/uidai/uidai_offline_kyc_cert.pem')),
+    ],
+
 ];
