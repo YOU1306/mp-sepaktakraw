@@ -17,7 +17,7 @@ if [[ "${1:-}" == "--first-run" ]]; then
   FIRST_RUN=true
 fi
 
-PHP_BIN="${PHP_BIN:-php8.3}"
+PHP_BIN="${PHP_BIN:-php8.4}"
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${APP_DIR}"
 
@@ -63,7 +63,7 @@ ${PHP_BIN} artisan view:cache
 ${PHP_BIN} artisan event:cache
 
 echo "==> Restarting PHP-FPM and queue worker"
-sudo systemctl reload php8.3-fpm
+sudo systemctl reload php8.4-fpm
 sudo supervisorctl restart mp-sepaktakraw-worker:* || true
 
 echo "==> Deploy complete."

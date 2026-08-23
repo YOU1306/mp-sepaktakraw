@@ -23,7 +23,7 @@ DOMAIN="mpsepaktakraw.in"                              # your real domain (or le
 GIT_REPO="git@github.com:YOU1306/mp-sepaktakraw.git"   # SSH remote of your GitHub repo
 DEPLOY_USER="deploy"                                    # non-root user that owns the app + runs deploys
 APP_DIR="/var/www/mp-sepaktakraw"
-PHP_VERSION="8.3"
+PHP_VERSION="8.4"
 DB_NAME="mp_sepaktakraw"
 DB_USER="mp_sepaktakraw"
 DB_PASS="$(openssl rand -base64 24 | tr -d '=+/')"      # auto-generated; printed at the end — save it
@@ -97,7 +97,7 @@ fi
 
 echo "==> Allowing ${DEPLOY_USER} to reload PHP-FPM / supervisor without a password (needed for automated deploys)"
 cat > /etc/sudoers.d/${DEPLOY_USER}-deploy <<SUDOERS
-${DEPLOY_USER} ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload php${PHP_VERSION}-fpm, /usr/bin/supervisorctl restart mp-sepaktakraw-worker:*
+${DEPLOY_USER} ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload php${PHP_VERSION}-fpm
 SUDOERS
 chmod 440 /etc/sudoers.d/${DEPLOY_USER}-deploy
 
