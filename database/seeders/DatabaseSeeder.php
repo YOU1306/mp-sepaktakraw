@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             DistrictSeeder::class,
             SuperAdminSeeder::class,
             DemoContentSeeder::class,
+            RegulationSeeder::class,
         ]);
     }
 }

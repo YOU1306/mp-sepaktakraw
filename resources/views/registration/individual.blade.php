@@ -5,7 +5,7 @@
 @section('content')
     <x-reg.shell
         title="Individual Registration"
-        subtitle="Register as a Player, Team Manager, Coach, Referee, Scorer or Official. Your phone and email are verified with a one-time code, and your Aadhaar is verified offline (no OTP) from the e-KYC file you download from myaadhaar.uidai.gov.in.">
+        subtitle="Register as a Player, Team Manager, Coach, Referee, Scorer or Official. Your phone and email are verified with a one-time code. Aadhaar verification will be completed securely by OTP after submission.">
 
         <form method="POST" action="{{ route('register.individual.store') }}" enctype="multipart/form-data" id="individual-form" class="space-y-2">
             @csrf
@@ -76,14 +76,15 @@
                 </div>
             </x-reg.section>
 
-            <x-reg.section number="4" title="Documents" description="Upload clear scans or photos. JPG, PNG or PDF, max 5 MB each.">
+            <x-reg.section number="4" title="Documents" description="Upload a clear Aadhaar PDF or image and enter the Aadhaar number. JPG, PNG or PDF, max 5 MB each.">
                 <div class="grid sm:grid-cols-2 gap-5">
                     <x-reg.file name="photo" label="Passport photo" required accept=".jpg,.jpeg,.png" />
                     <div>
-                        <x-reg.file name="aadhaar" label="Aadhaar offline e-KYC (ZIP or XML)" required accept=".xml,.zip"
-                            hint="Download 'Offline e-KYC' from myaadhaar.uidai.gov.in. No OTP required from us — the file itself carries UIDAI's verified, signed data. The name and date of birth on this file must match what you entered above." />
+                        <x-reg.file name="aadhaar" label="Aadhaar card" required accept=".jpg,.jpeg,.png,.pdf"
+                            hint="Upload a clear scan or photograph of the Aadhaar card. It will be stored privately for review." />
                         <div class="mt-2">
-                            <x-reg.input name="aadhaar_share_code" label="Share code (only if you uploaded the ZIP)" hint="The 4-character code you set while downloading the ZIP." />
+                            <x-reg.input name="aadhaar_number" label="Aadhaar number" required inputmode="numeric" maxlength="12" pattern="[0-9]{12}"
+                                hint="Enter the 12-digit number. The linked mobile number will be verified by OTP when Signzy is connected." />
                         </div>
                     </div>
                     <div id="marksheet-field" class="hidden">

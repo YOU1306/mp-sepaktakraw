@@ -98,7 +98,7 @@ class RegistrationApplicationsTable
                                 TextEntry::make('player.email')->label('Email'),
                                 TextEntry::make('player.contact_number')->label('Contact'),
                                 TextEntry::make('player.address')->label('Address')->columnSpanFull(),
-                                TextEntry::make('aadhaar_kyc')->label('Aadhaar offline e-KYC')->columnSpanFull()
+                                TextEntry::make('aadhaar_kyc')->label('Aadhaar verification')->columnSpanFull()
                                     ->state(fn (RegistrationApplication $r) => self::aadhaarKycSummary($r))->html(),
                                 TextEntry::make('player_docs')->hiddenLabel()->columnSpanFull()
                                     ->state(fn (RegistrationApplication $r) => self::documentLinks($r->player?->documents))->html(),
@@ -173,9 +173,13 @@ class RegistrationApplicationsTable
             return '<span class="text-gray-500">-</span>';
         }
 
-        $badge = $player->aadhaar_verified
+        $badge = $player->aadhaar_verification_status === 'verified'
             ? '<span class="text-green-700 font-medium">✓ Digitally verified</span>'
-            : '<span class="text-amber-700 font-medium">⚠ Not verified — manual check required</span>';
+            : '<span class="text-amber-700 font-medium">Pending OTP verification</span>';
+
+        $number = $player->aadhaar_number_masked
+            ? '<span class="text-gray-600 ml-3">'.e($player->aadhaar_number_masked).'</span>'
+            : '';
 
         $identityBadge = match ($player->aadhaar_identity_match) {
             true => '<span class="text-green-700 font-medium ml-3">✓ Name &amp; DOB match the form</span>',
@@ -188,7 +192,7 @@ class RegistrationApplicationsTable
             ->map(fn ($v, $k) => '<strong>'.e(ucfirst(str_replace('_', ' ', $k))).':</strong> '.e($v))
             ->implode(' &nbsp;|&nbsp; ');
 
-        return '<div>'.$badge.$identityBadge.$note.($extracted ? '<div class="text-gray-600 mt-1">'.$extracted.'</div>' : '').'</div>';
+        return '<div>'.$badge.$number.$identityBadge.$note.($extracted ? '<div class="text-gray-600 mt-1">'.$extracted.'</div>' : '').'</div>';
     }
 
     protected static function officeBearersTable(RegistrationApplication $r): string
@@ -204,11 +208,12 @@ class RegistrationApplicationsTable
                 .'<td class="py-1 pr-3">'.e($b->designationLabel()).'</td>'
                 .'<td class="py-1 pr-3">'.e($b->contact).'</td>'
                 .'<td class="py-1 pr-3">'.e($b->email).'</td>'
+                .'<td class="py-1 pr-3">'.e($b->aadhaar_number_masked ?? '-').'</td>'
                 .'<td class="py-1">'.self::documentLinks($b->documents).'</td></tr>';
         })->implode('');
 
         return '<table class="w-full text-sm"><thead><tr class="text-left text-gray-500 border-b border-gray-200">'
-            .'<th class="py-1 pr-3">Name</th><th class="py-1 pr-3">Designation</th><th class="py-1 pr-3">Contact</th><th class="py-1 pr-3">Email</th><th class="py-1">Aadhaar</th>'
+            .'<th class="py-1 pr-3">Name</th><th class="py-1 pr-3">Designation</th><th class="py-1 pr-3">Contact</th><th class="py-1 pr-3">Email</th><th class="py-1 pr-3">Aadhaar number</th><th class="py-1">Aadhaar document</th>'
             .'</tr></thead><tbody>'.$rows.'</tbody></table>';
     }
 }

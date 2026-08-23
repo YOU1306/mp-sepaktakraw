@@ -8,7 +8,7 @@ use App\Models\Player;
 use App\Models\RegistrationApplication;
 use App\Models\Setting;
 use App\Models\VerificationCode;
-use App\Services\AadhaarOfflineKycService;
+use App\Services\AadhaarNumberService;
 use App\Services\AuditService;
 use App\Services\DocumentService;
 use App\Services\OtpService;
@@ -34,7 +34,7 @@ class IndividualRegistrationController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $docRules = ['required', 'file', 'mimes:jpg,jpeg,png,pdf,xml,zip', 'max:5120'];
+        $docRules = ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'];
         $photoRules = ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'];
 
         $validator = validator($request->all(), [
@@ -51,7 +51,7 @@ class IndividualRegistrationController extends Controller
             'district_id' => ['required', 'exists:districts,id'],
             'billing_period' => ['required', 'in:'.implode(',', array_keys(Setting::PERIODS))],
             'aadhaar' => $docRules,
-            'aadhaar_share_code' => ['nullable', 'string', 'max:20'],
+            'aadhaar_number' => ['required', 'digits:12'],
             'photo' => $photoRules,
             'phone_token' => ['required', 'string'],
             'email_token' => ['required', 'string'],
@@ -80,6 +80,10 @@ class IndividualRegistrationController extends Controller
 
             if (! OtpService::isVerifiedFor($request->input('email_token'), VerificationCode::CHANNEL_EMAIL, (string) $request->input('email'))) {
                 $v->errors()->add('email_token', 'Please verify your email address with the code sent to it.');
+            }
+
+            if (! AadhaarNumberService::isValid((string) $request->input('aadhaar_number'))) {
+                $v->errors()->add('aadhaar_number', 'Enter a valid 12-digit Aadhaar number.');
             }
         });
 
@@ -122,15 +126,13 @@ class IndividualRegistrationController extends Controller
             DocumentService::store($player, $request->file('photo'), Document::KIND_PHOTO);
             $aadhaarDoc = DocumentService::store($player, $request->file('aadhaar'), Document::KIND_AADHAAR);
 
-            $kyc = AadhaarOfflineKycService::verify($request->file('aadhaar'), $request->input('aadhaar_share_code'), [
-                'name' => $validated['name'],
-                'dob' => $validated['dob'],
-            ]);
             $player->update([
-                'aadhaar_verified' => $kyc['verified'],
-                'aadhaar_kyc_data' => $kyc['data'],
-                'aadhaar_kyc_note' => $kyc['note'],
-                'aadhaar_identity_match' => $kyc['identity_match'],
+                'aadhaar_verified' => false,
+                'aadhaar_number_masked' => AadhaarNumberService::mask($validated['aadhaar_number']),
+                'aadhaar_kyc_data' => null,
+                'aadhaar_kyc_note' => 'Awaiting Aadhaar OTP verification through the configured verification provider.',
+                'aadhaar_identity_match' => null,
+                'aadhaar_verification_status' => Player::AADHAAR_STATUS_PENDING,
             ]);
 
             if ($isPlayer) {
@@ -145,8 +147,8 @@ class IndividualRegistrationController extends Controller
             AuditService::logModel('submitted', $application, [
                 'fee' => $fee,
                 'member_role' => $validated['member_role'],
-                'aadhaar_verified' => $kyc['verified'],
-                'aadhaar_identity_match' => $kyc['identity_match'],
+                'aadhaar_verified' => false,
+                'aadhaar_verification_status' => Player::AADHAAR_STATUS_PENDING,
             ]);
 
             return $application;

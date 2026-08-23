@@ -69,6 +69,7 @@
                     <a href="{{ route('content.index.notices') }}" class="hover:text-green-800 {{ request()->routeIs('content.index.notices') ? 'font-semibold text-stone-900' : '' }}">Notices</a>
                     <a href="{{ route('content.index.results') }}" class="hover:text-green-800 {{ request()->routeIs('content.index.results') ? 'font-semibold text-stone-900' : '' }}">Results</a>
                     <a href="{{ route('content.index.events') }}" class="hover:text-green-800 {{ request()->routeIs('content.index.events') ? 'font-semibold text-stone-900' : '' }}">Events</a>
+                    <a href="{{ route('regulations.index') }}" class="hover:text-green-800 {{ request()->routeIs('regulations.*') ? 'font-semibold text-stone-900' : '' }}">Rules &amp; Regulations</a>
 
                     <div class="relative group">
                         <a href="{{ route('register') }}" class="flex items-center gap-1 hover:text-green-800 {{ request()->routeIs('register*') ? 'font-semibold text-stone-900' : '' }}">
@@ -122,6 +123,7 @@
                     <li><a href="{{ route('content.index.notices') }}" class="hover:text-white hover:underline">Notices</a></li>
                     <li><a href="{{ route('content.index.results') }}" class="hover:text-white hover:underline">Results</a></li>
                     <li><a href="{{ route('content.index.events') }}" class="hover:text-white hover:underline">Events</a></li>
+                    <li><a href="{{ route('regulations.index') }}" class="hover:text-white hover:underline">Rules &amp; Regulations</a></li>
                 </ul>
             </div>
             <div>

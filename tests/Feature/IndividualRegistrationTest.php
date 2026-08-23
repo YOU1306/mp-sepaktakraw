@@ -55,7 +55,8 @@ class IndividualRegistrationTest extends TestCase
             'contact_number' => '9876543210',
             'district_id' => $district->id,
             'billing_period' => 'quarterly',
-            'aadhaar' => UploadedFile::fake()->create('aadhaar.xml', 10, 'text/xml'),
+            'aadhaar' => UploadedFile::fake()->create('aadhaar.pdf', 100, 'application/pdf'),
+            'aadhaar_number' => '311371493657',
             'marksheet' => UploadedFile::fake()->create('marksheet.pdf', 100, 'application/pdf'),
             'photo' => UploadedFile::fake()->image('photo.jpg'),
             'birth_certificate' => UploadedFile::fake()->create('birth.pdf', 100, 'application/pdf'),
@@ -78,6 +79,10 @@ class IndividualRegistrationTest extends TestCase
             'billing_period' => 'quarterly',
         ]);
         $this->assertDatabaseHas('players', ['name' => 'Test Player', 'category' => 'junior', 'member_role' => 'player']);
+        $this->assertDatabaseHas('players', [
+            'aadhaar_number_masked' => 'XXXX-XXXX-3657',
+            'aadhaar_verification_status' => 'pending',
+        ]);
 
         $application = RegistrationApplication::first();
         $this->assertCount(4, $application->player->documents); // photo, aadhaar, marksheet, birth certificate

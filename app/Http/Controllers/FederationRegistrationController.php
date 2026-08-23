@@ -9,6 +9,7 @@ use App\Models\OfficeBearer;
 use App\Models\RegistrationApplication;
 use App\Models\Setting;
 use App\Services\AuditService;
+use App\Services\AadhaarNumberService;
 use App\Services\DocumentService;
 use App\Services\PaymentService;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +42,12 @@ class FederationRegistrationController extends Controller
 
         $validator->after(function ($v) use ($request) {
             $this->validateSecretaryPresent($v, $request->input('office_bearers', []));
+
+            foreach ($request->input('office_bearers', []) as $index => $bearer) {
+                if (! AadhaarNumberService::isValid((string) ($bearer['aadhaar_number'] ?? ''))) {
+                    $v->errors()->add("office_bearers.$index.aadhaar_number", 'Enter a valid 12-digit Aadhaar number.');
+                }
+            }
         });
 
         $validated = $validator->validate();

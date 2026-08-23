@@ -10,6 +10,7 @@ use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\RegulationController;
 use App\Http\Controllers\VerificationController;
 use App\Models\Content;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,9 @@ Route::get('/news', fn () => app(ContentController::class)->index('news'))->name
 Route::get('/notices', fn () => app(ContentController::class)->index('notices'))->name('content.index.notices');
 Route::get('/results', fn () => app(ContentController::class)->index('results'))->name('content.index.results');
 Route::get('/events', fn () => app(ContentController::class)->index('events'))->name('content.index.events');
+
+Route::get('/rules-regulations', [RegulationController::class, 'index'])->name('regulations.index');
+Route::get('/rules-regulations/{regulation}/view', [RegulationController::class, 'show'])->name('regulations.show');
 
 // Registration landing (individual / federation flows)
 Route::get('/register', [RegistrationController::class, 'index'])->name('register');

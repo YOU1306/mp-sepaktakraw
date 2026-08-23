@@ -43,6 +43,13 @@
         <div>
             <x-reg.file name="office_bearers[{{ $index }}][aadhaar]" label="Aadhaar card" required />
         </div>
+        <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Aadhaar number <span class="text-red-500">*</span></label>
+            <input type="text" name="office_bearers[{{ $index }}][aadhaar_number]" value="{{ $v('aadhaar_number') }}" required
+                inputmode="numeric" maxlength="12" pattern="[0-9]{12}"
+                class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 outline-none">
+            <p class="text-xs text-stone-500 mt-1">The linked mobile number will be verified by OTP when Signzy is connected.</p>
+        </div>
         <div class="sm:col-span-2">
             <label class="block text-xs font-medium text-stone-600 mb-1">Address <span class="text-red-500">*</span></label>
             <textarea name="office_bearers[{{ $index }}][address]" rows="2" required

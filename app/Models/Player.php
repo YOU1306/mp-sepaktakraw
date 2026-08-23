@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Player extends Model
 {
+    public const AADHAAR_STATUS_PENDING = 'pending';
+
+    public const AADHAAR_STATUS_VERIFIED = 'verified';
+
+    public const AADHAAR_STATUS_FAILED = 'failed';
+
     public const CATEGORY_SUB_JUNIOR = 'sub_junior';
 
     public const CATEGORY_JUNIOR = 'junior';
@@ -71,6 +77,7 @@ class Player extends Model
         'aadhaar_kyc_data',
         'aadhaar_kyc_note',
         'aadhaar_identity_match',
+        'aadhaar_verification_status',
     ];
 
     protected function casts(): array

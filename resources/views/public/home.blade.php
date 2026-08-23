@@ -3,17 +3,10 @@
 @section('title', 'Home — '.config('app.name'))
 
 @section('content')
-    <section class="relative mb-10 rounded-xl overflow-hidden text-white p-8 md:p-14 min-h-[320px] flex items-end bg-stone-900"
-        style="background-image: linear-gradient(115deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.72) 40%, rgba(10,10,10,0.3) 100%), url('{{ asset('images/hero-team-honour.png') }}'); background-size: cover; background-position: center;">
-        <div class="relative z-10 max-w-2xl">
-            <span class="inline-block text-[11px] font-semibold uppercase tracking-wider bg-orange-500 px-2.5 py-1 rounded mb-4">
-                Team India &middot; National Honour
-            </span>
-            <h1 class="text-3xl md:text-4xl font-bold mb-3 drop-shadow">Sepaktakraw Association Of Madhya Pradesh</h1>
-            <p class="text-stone-100 text-lg drop-shadow">
-                Official portal for news, notices, results, and player registrations across all districts of Madhya Pradesh.
-            </p>
-        </div>
+    <section class="relative mb-10 rounded-xl overflow-hidden bg-stone-100">
+        <img src="{{ asset('images/homepage-association.jpg') }}"
+             alt="Sepaktakraw Association of Madhya Pradesh"
+             class="block w-full h-auto" fetchpriority="high">
         <div class="absolute inset-x-0 bottom-0 h-1.5 flex z-10" aria-hidden="true">
             <span class="flex-1 bg-orange-500"></span>
             <span class="flex-1 bg-white"></span>
@@ -42,7 +35,7 @@
                     <span class="flex-1 bg-white"></span>
                     <span class="flex-1 bg-green-700"></span>
                 </div>
-                <img src="{{ asset('images/leadership/mp-association-office-bearers.png') }}"
+                <img src="{{ asset('images/mp-association-office-bearers.jpg') }}"
                      alt="Office bearers of the Sepaktakraw Association of Madhya Pradesh (R): President, Secretary and Joint Secretary"
                      class="w-full h-auto" loading="lazy">
                 <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
@@ -152,4 +145,33 @@
             </div>
         </section>
     @endif
+
+    <section class="mt-10 rounded-xl overflow-hidden bg-stone-900">
+        <div class="h-1.5 flex" aria-hidden="true">
+            <span class="flex-1 bg-orange-500"></span>
+            <span class="flex-1 bg-white"></span>
+            <span class="flex-1 bg-green-700"></span>
+        </div>
+        <div class="px-6 py-6">
+            <p class="text-center text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-5">
+                National Initiatives &amp; Affiliations
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
+                @foreach([
+                    ['file' => 'g20.png', 'alt' => 'G20 India 2023'],
+                    ['file' => 'minister-anurag-thakur.png', 'alt' => "Shri Anurag Singh Thakur, Hon'ble Union Minister of Youth Affairs and Sports"],
+                    ['file' => 'azadi-ka-amrit-mahotsav.png', 'alt' => 'Azadi Ka Amrit Mahotsav'],
+                    ['file' => 'fit-india.png', 'alt' => 'Fit India Movement'],
+                    ['file' => 'astaf.png', 'alt' => 'Asian Sepaktakraw Federation (ASTAF)'],
+                    ['file' => 'istaf.png', 'alt' => 'International Sepaktakraw Federation (ISTAF)'],
+                    ['file' => 'swachh-bharat.png', 'alt' => 'Swachh Bharat Abhiyan'],
+                    ['file' => 'khelo-india.png', 'alt' => 'Khelo India'],
+                    ['file' => 'sai.png', 'alt' => 'Sports Authority of India (SAI)'],
+                ] as $partner)
+                    <img src="{{ asset('images/partners/'.$partner['file']) }}" alt="{{ $partner['alt'] }}"
+                         class="h-16 w-auto object-contain rounded" loading="lazy">
+                @endforeach
+            </div>
+        </div>
+    </section>
 @endsection

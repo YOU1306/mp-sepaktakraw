@@ -39,6 +39,7 @@ class FederationRegistrationTest extends TestCase
                 'email' => "bearer$i@example.com",
                 'designation' => ($withSecretary && $i === 0) ? 'secretary' : 'member',
                 'aadhaar' => UploadedFile::fake()->create("aadhaar$i.pdf", 80, 'application/pdf'),
+                'aadhaar_number' => '311371493657',
             ];
         }
 

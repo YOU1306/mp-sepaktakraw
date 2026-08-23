@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class OfficeBearer extends Model
 {
+    public const AADHAAR_STATUS_PENDING = 'pending';
+
+    public const AADHAAR_STATUS_VERIFIED = 'verified';
+
+    public const AADHAAR_STATUS_FAILED = 'failed';
+
     public const DESIGNATION_SECRETARY = 'secretary';
 
     public const DESIGNATIONS = [
@@ -27,6 +33,9 @@ class OfficeBearer extends Model
         'phone',
         'email',
         'designation',
+        'aadhaar_number_masked',
+        'aadhaar_verification_status',
+        'aadhaar_verification_note',
     ];
 
     public function application(): BelongsTo

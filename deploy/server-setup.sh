@@ -49,6 +49,15 @@ apt-get install -y nginx \
   php${PHP_VERSION}-gd php${PHP_VERSION}-intl php${PHP_VERSION}-bcmath \
   php${PHP_VERSION}-sqlite3
 
+echo "==> Raising PHP upload limits (default 2M is too small for Aadhaar e-KYC ZIPs and Rules & Regulations PDFs)"
+for ini in /etc/php/${PHP_VERSION}/fpm/php.ini /etc/php/${PHP_VERSION}/cli/php.ini; do
+  sed -i \
+    -e "s/^upload_max_filesize.*/upload_max_filesize = 20M/" \
+    -e "s/^post_max_size.*/post_max_size = 25M/" \
+    "${ini}"
+done
+systemctl restart php${PHP_VERSION}-fpm
+
 echo "==> Installing MySQL"
 apt-get install -y mysql-server
 mysql -u root <<SQL

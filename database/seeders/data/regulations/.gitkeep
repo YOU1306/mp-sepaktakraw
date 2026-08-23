@@ -1,0 +1,11 @@
+# Place the 5 regulation PDF files in this directory before running db:seed.
+# Expected filenames (exactly as listed):
+#
+#   Law-of-the-Game-2024-Double.pdf
+#   Law-of-the-Game-2024-Regu.pdf
+#   Law-of-the-Game-2024-Beach-Sepaktakraw.pdf
+#   Law-of-the-Game-2024-Quad.pdf
+#   STFI-Score-Sheet.pdf
+#
+# If a file is missing the seeder will still create the database record
+# but will mark it as inactive so no broken link appears on the public site.
