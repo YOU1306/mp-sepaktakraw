@@ -12,6 +12,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RegulationController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\WebhookController;
 use App\Models\Content;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/membership/renew', [MembershipController::class, 'show'])->name('membership.renew');
     Route::post('/membership/renew', [MembershipController::class, 'process'])->name('membership.renew.process');
+    Route::get('/membership/renew/{payment}/checkout', [MembershipController::class, 'checkout'])->name('membership.checkout');
+    Route::post('/membership/renew/{payment}/confirm', [MembershipController::class, 'confirm'])->name('membership.renew.confirm');
 
     Route::post('/notifications/{notification}/read', [DashboardController::class, 'markNotificationRead'])->name('notifications.read');
 
@@ -63,5 +66,9 @@ Route::get('/{type}/{content:slug}', [ContentController::class, 'show'])
     ->name('content.show');
 
 Route::get('/page/{slug}', [ContentController::class, 'page'])->name('page.show');
+
+// Razorpay webhook — authoritative confirmation of a captured payment.
+// CSRF is exempted (see bootstrap/app.php) because Razorpay signs the raw body.
+Route::post('/webhooks/payment', [WebhookController::class, 'handle'])->name('webhooks.payment');
 
 Route::bind('content', fn (string $value) => Content::query()->where('slug', $value)->firstOrFail());

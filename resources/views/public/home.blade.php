@@ -28,21 +28,7 @@
             </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <figure class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
-                <div class="h-1.5 flex" aria-hidden="true">
-                    <span class="flex-1 bg-orange-500"></span>
-                    <span class="flex-1 bg-white"></span>
-                    <span class="flex-1 bg-green-700"></span>
-                </div>
-                <img src="{{ asset('images/mp-association-office-bearers.jpg') }}"
-                     alt="Office bearers of the Sepaktakraw Association of Madhya Pradesh (R): President, Secretary and Joint Secretary"
-                     class="w-full h-auto" loading="lazy">
-                <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
-                    Sepaktakraw Association of Madhya Pradesh (R)
-                </figcaption>
-            </figure>
-
+        <div class="flex flex-col gap-6 max-w-2xl mx-auto">
             <figure class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
                 <div class="h-1.5 flex" aria-hidden="true">
                     <span class="flex-1 bg-orange-500"></span>
@@ -54,6 +40,34 @@
                      class="w-full h-auto" loading="lazy">
                 <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
                     Affiliated to Sepaktakraw Federation of India
+                </figcaption>
+            </figure>
+
+            <figure class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="h-1.5 flex" aria-hidden="true">
+                    <span class="flex-1 bg-orange-500"></span>
+                    <span class="flex-1 bg-white"></span>
+                    <span class="flex-1 bg-green-700"></span>
+                </div>
+                <img src="{{ asset('images/leadership/1000283779.jpg') }}"
+                     alt="Sepaktakraw Federation of India leadership team"
+                     class="w-full h-auto" loading="lazy">
+                <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
+                    Sepaktakraw Federation of India
+                </figcaption>
+            </figure>
+
+            <figure class="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="h-1.5 flex" aria-hidden="true">
+                    <span class="flex-1 bg-orange-500"></span>
+                    <span class="flex-1 bg-white"></span>
+                    <span class="flex-1 bg-green-700"></span>
+                </div>
+                <img src="{{ asset('images/leadership/gemini-generated.png') }}"
+                     alt="Sepaktakraw leadership and team"
+                     class="w-full h-auto" loading="lazy">
+                <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
+                    Our Leadership
                 </figcaption>
             </figure>
         </div>

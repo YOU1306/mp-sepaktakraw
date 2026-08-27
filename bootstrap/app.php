@@ -18,6 +18,12 @@ return Application::configure(basePath: dirname(__DIR__))
             EnsurePasswordChanged::class,
             EnsureMembershipActive::class,
         ]);
+
+        // Razorpay signs the raw webhook body, so the gateway cannot send a CSRF
+        // token. Exempt the webhook route; we verify its HMAC signature instead.
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/payment',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

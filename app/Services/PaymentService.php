@@ -7,6 +7,7 @@ use App\Models\RegistrationApplication;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Razorpay\Api\Api;
 
@@ -37,9 +38,12 @@ class PaymentService
             ?? $payable->user_id
             ?? Str::upper(Str::random(10));
 
+        // Razorpay receipt max length is 40 characters.
+        $receipt = Str::limit((string) $receipt, 40, '');
+
         $orderId = self::isTestMode()
             ? 'TEST_'.Str::upper(Str::random(16))
-            : self::createRazorpayOrder($amount, $receipt);
+            : self::createRazorpayOrder($amount, $receipt, $payable);
 
         return $payable->payments()->create([
             'user_id' => $payable instanceof User ? $payable->id : null,
@@ -54,58 +58,114 @@ class PaymentService
     /**
      * Mark a payment as paid and move the application into review, or
      * extend a membership renewal — depending on what it is paying for.
+     *
+     * Idempotent under concurrent browser callback + webhook: a row lock
+     * ensures side effects (district notify, membership extension) run once.
      */
     public static function markPaid(Payment $payment, ?string $gatewayPaymentId = null, ?string $signature = null): void
     {
-        $payment->update([
-            'status' => Payment::STATUS_PAID,
-            'gateway_payment_id' => $gatewayPaymentId ?? 'TEST_PAY_'.Str::upper(Str::random(12)),
-            'gateway_signature' => $signature,
-        ]);
+        DB::transaction(function () use ($payment, $gatewayPaymentId, $signature) {
+            /** @var Payment $locked */
+            $locked = Payment::query()->whereKey($payment->id)->lockForUpdate()->firstOrFail();
 
-        $payable = $payment->payable;
+            if ($locked->status === Payment::STATUS_PAID) {
+                return;
+            }
 
-        if ($payable instanceof RegistrationApplication) {
-            $payable->update([
-                'status' => RegistrationApplication::STATUS_UNDER_REVIEW,
-                'submitted_at' => now(),
-                'expires_at' => null,
+            $locked->update([
+                'status' => Payment::STATUS_PAID,
+                'gateway_payment_id' => $gatewayPaymentId ?? 'TEST_PAY_'.Str::upper(Str::random(12)),
+                'gateway_signature' => $signature ?? $locked->gateway_signature,
             ]);
 
-            AuditService::logModel('payment_completed', $payable, ['amount' => $payment->amount]);
+            $payable = $locked->payable;
 
-            NotificationService::notifyDistrictOfPayment($payable);
+            if ($payable instanceof RegistrationApplication) {
+                $payable->update([
+                    'status' => RegistrationApplication::STATUS_UNDER_REVIEW,
+                    'submitted_at' => now(),
+                    'expires_at' => null,
+                ]);
+
+                AuditService::logModel('payment_completed', $payable, ['amount' => $locked->amount]);
+
+                NotificationService::notifyDistrictOfPayment($payable);
+            }
+
+            if ($payable instanceof User) {
+                $period = $locked->billing_period ?? $payable->membership_period ?? Setting::PERIOD_QUARTERLY;
+                $base = $payable->isMembershipExpired() || ! $payable->membership_expires_at
+                    ? now()
+                    : $payable->membership_expires_at;
+
+                $payable->update([
+                    'membership_period' => $period,
+                    'membership_expires_at' => $base->copy()->addMonths(Setting::periodMonths($period)),
+                    'membership_reminder_sent_at' => null,
+                ]);
+
+                AuditService::logModel('membership_renewed', $payable, ['amount' => $locked->amount, 'period' => $period]);
+            }
+        });
+    }
+
+    /**
+     * Verify the HMAC-SHA256 signature Razorpay returns to the browser for an
+     * order/payment. Format: hash_hmac('sha256', order_id . "|" . payment_id, secret).
+     * Always compare with hash_equals to avoid timing attacks.
+     */
+    public static function verifySignature(string $orderId, string $paymentId, string $signature): bool
+    {
+        $expected = hash_hmac('sha256', $orderId.'|'.$paymentId, (string) config('services.razorpay.secret'));
+
+        return hash_equals($expected, $signature);
+    }
+
+    /**
+     * Verify the HMAC-SHA256 signature on a Razorpay webhook request. The body
+     * must be the RAW request payload (not json-encoded/decoded) and the header
+     * is X-Razorpay-Signature. Returns false if no webhook secret is configured.
+     */
+    public static function verifyWebhook(string $rawBody, ?string $signatureHeader): bool
+    {
+        $secret = (string) config('services.razorpay.webhook_secret');
+
+        if ($secret === '' || ! $signatureHeader) {
+            return false;
         }
 
-        if ($payable instanceof User) {
-            $period = $payment->billing_period ?? $payable->membership_period ?? Setting::PERIOD_QUARTERLY;
-            $base = $payable->isMembershipExpired() || ! $payable->membership_expires_at
-                ? now()
-                : $payable->membership_expires_at;
+        $expected = hash_hmac('sha256', $rawBody, $secret);
 
-            $payable->update([
-                'membership_period' => $period,
-                'membership_expires_at' => $base->copy()->addMonths(Setting::periodMonths($period)),
-                'membership_reminder_sent_at' => null,
-            ]);
-
-            AuditService::logModel('membership_renewed', $payable, ['amount' => $payment->amount, 'period' => $period]);
-        }
+        return hash_equals($expected, $signatureHeader);
     }
 
     /**
      * $amountRupees is stored as-is in our DB; Razorpay's API requires paise,
      * so it is only multiplied by 100 at this API boundary.
      */
-    protected static function createRazorpayOrder(int $amountRupees, string $receipt): string
+    protected static function createRazorpayOrder(int $amountRupees, string $receipt, Model $payable): string
     {
         $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
+
+        $notes = [
+            'payable_type' => class_basename($payable),
+            'payable_id' => (string) $payable->getKey(),
+        ];
+
+        if ($payable instanceof RegistrationApplication) {
+            $notes['reference_no'] = (string) $payable->reference_no;
+        }
+
+        if ($payable instanceof User) {
+            $notes['user_id'] = (string) $payable->user_id;
+        }
 
         $order = $api->order->create([
             'amount' => $amountRupees * 100,
             'currency' => 'INR',
             'receipt' => $receipt,
             'payment_capture' => 1,
+            'notes' => $notes,
         ]);
 
         return $order['id'];

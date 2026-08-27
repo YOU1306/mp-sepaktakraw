@@ -29,10 +29,11 @@ class SendMembershipReminders extends Command
             if ($user->phone) {
                 SmsService::send(
                     $user->phone,
-                    "Your MP Sepaktakraw membership ({$user->user_id}) expires on {$user->membership_expires_at->format('d M Y')}. Renew soon to avoid losing access."
+                    "Your MP Sepaktakraw membership ({$user->user_id}) expires on {$user->membership_expires_at->format('d M Y')}. Renew soon to avoid losing access.",
+                    SmsService::TPL_MEMBERSHIP_EXPIRY
                 );
             }
-
+            
             $user->update(['membership_reminder_sent_at' => now()]);
         }
 

@@ -71,7 +71,8 @@ class RegistrationReviewService
             if ($application->applicant_phone) {
                 SmsService::send(
                     $application->applicant_phone,
-                    "Your MP Sepaktakraw registration ({$application->reference_no}) is approved. User ID: {$credentials['user_id']}. Check your email for the password."
+                    "Your MP Sepaktakraw registration ({$application->reference_no}) is approved. User ID: {$credentials['user_id']}. Check your email for the password.",
+                    SmsService::TPL_APPROVED
                 );
             }
 
@@ -99,7 +100,8 @@ class RegistrationReviewService
         if ($application->applicant_phone) {
             SmsService::send(
                 $application->applicant_phone,
-                "Your MP Sepaktakraw registration ({$application->reference_no}) was not approved. Please submit a new request. Check your email for details."
+                "Your MP Sepaktakraw registration ({$application->reference_no}) was not approved. Please submit a new request. Check your email for details.",
+                SmsService::TPL_REJECTED
             );
         }
     }

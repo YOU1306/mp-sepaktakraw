@@ -30,8 +30,12 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register.payment.process', $application->reference_no) }}">
+            <form method="POST" action="{{ route('register.payment.process', $application->reference_no) }}" id="pay-form">
                 @csrf
+                <input type="hidden" name="razorpay_order_id" value="{{ $payment->gateway_order_id }}">
+                <input type="hidden" name="razorpay_payment_id" value="">
+                <input type="hidden" name="razorpay_signature" value="">
+
                 @if ($testMode)
                     <p class="text-xs text-stone-500 mb-3 text-center">Payment gateway is in <strong>test mode</strong> (no live keys configured). Click below to simulate a successful payment.</p>
                     <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg shadow-sm">
@@ -39,13 +43,57 @@
                     </button>
                 @else
                     <p class="text-xs text-stone-500 mb-3 text-center">You will be redirected to the secure Razorpay gateway.</p>
-                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg shadow-sm">
+                    <button type="button" id="rzp-button" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg shadow-sm">
                         Pay ₹{{ number_format($payment->amount, 2) }}
                     </button>
                 @endif
             </form>
         </div>
     </div>
+
+    @if (! $testMode)
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <script>
+            const rzpButton = document.getElementById('rzp-button');
+            const payForm = document.getElementById('pay-form');
+            rzpButton.addEventListener('click', function () {
+                rzpButton.disabled = true;
+                const rzp = new Razorpay({
+                    key: @json(config('services.razorpay.key')),
+                    amount: {{ intval($payment->amount) * 100 }},
+                    currency: 'INR',
+                    name: 'MP Sepaktakraw Federation',
+                    description: 'Registration ' + @json($application->reference_no),
+                    order_id: @json($payment->gateway_order_id),
+                    prefill: {
+                        name: @json($application->applicant_name),
+                        email: @json($application->applicant_email),
+                        contact: @json($application->applicant_phone),
+                    },
+                    notes: {
+                        reference_no: @json($application->reference_no),
+                        type: @json($application->type),
+                    },
+                    handler: function (response) {
+                        payForm.querySelector('[name=razorpay_payment_id]').value = response.razorpay_payment_id;
+                        payForm.querySelector('[name=razorpay_signature]').value = response.razorpay_signature;
+                        payForm.submit();
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            rzpButton.disabled = false;
+                        }
+                    },
+                    theme: { color: '#f97316' }
+                });
+                rzp.on('payment.failed', function () {
+                    rzpButton.disabled = false;
+                    alert('Payment failed. Please try again.');
+                });
+                rzp.open();
+            });
+        </script>
+    @endif
 
     @if ($deadline)
         <script>

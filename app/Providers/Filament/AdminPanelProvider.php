@@ -28,6 +28,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('MP Sepaktakraw Admin')
+            ->brandLogo(fn () => asset('images/logo.jpg'))
+            ->brandLogoHeight('2.5rem')
             ->colors([
                 'primary' => Color::Orange,
             ])

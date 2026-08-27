@@ -61,12 +61,11 @@ auto-deploy, backups, going-live checklist) is documented in
 [`deploy/`](deploy/) — `server-setup.sh` (one-time VPS bootstrap) and
 `deploy.sh` (every deploy after that).
 
-**Known gap before enabling real fees:** Razorpay integration is currently a
-test-mode stub (see `docs/DEPLOYMENT.md` §6) — Checkout.js widget, signature
-verification, and the webhook route still need to be built. Individual and
-Federation registrations both carry a real fee (quarterly/half-yearly/yearly),
-so this should be finished before go-live — until then, test-mode "payments"
-complete the workflow locally without a live gateway.
+**Razorpay status:** Checkout.js, server-side HMAC signature verification, and
+the `/webhooks/payment` endpoint are wired. Leave `RAZORPAY_*` blank for local
+test-mode (one-click simulate pay). Put **test** keys in `.env` to exercise the
+real gateway before go-live; switch to **live** keys only after Razorpay KYC.
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) §6.
 
 **Other known gaps:**
 - **SMS (MSG91):** wired via `SmsService`/`OtpService`, but falls back to a
@@ -83,10 +82,10 @@ complete the workflow locally without a live gateway.
 Public site, auth/RBAC, admin panel, and individual/federation registration
 flows (Club registration has been removed — a Club's former responsibilities
 now sit with the District Federation / Admin / Super Admin) are built and
-tested locally (18 passing tests). Individual registration covers
+tested locally. Individual registration covers
 Player/Team Manager/Coach/Referee/Scorer/Official in one flow, with phone +
 email OTP verification, offline Aadhaar e-KYC, and quarterly/half-yearly/
 yearly billing with automatic reminders + access lockout on missed renewal.
-Next: finish the real Razorpay gateway integration, add live MSG91 +
-UIDAI certificate credentials, then follow
-[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) to go live.
+Razorpay order/verify/webhook integration is complete. Next: add live MSG91 +
+UIDAI certificate credentials, run an end-to-end Razorpay **test-mode**
+payment, then follow [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) to go live.

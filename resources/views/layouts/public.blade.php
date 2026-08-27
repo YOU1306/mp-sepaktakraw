@@ -42,12 +42,7 @@
     {{-- Header --}}
     <header class="bg-white border-b border-stone-200">
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
-            <span class="shrink-0 w-14 h-14 rounded-full text-stone-800 flex items-center justify-center ring-4 ring-stone-200 shadow-sm"
-                style="background: linear-gradient(180deg, #f97316 0%, #f97316 33%, #ffffff 33%, #ffffff 67%, #15803d 67%, #15803d 100%);">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-7 h-7 drop-shadow-sm">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                </svg>
-            </span>
+            <img src="{{ asset('images/logo.jpg') }}" alt="Sepaktakraw Association Of Madhya Pradesh Logo" class="shrink-0 w-14 h-14 rounded-full ring-4 ring-stone-200 shadow-sm object-cover">
             <div class="min-w-0">
                 <a href="{{ route('home') }}" class="block font-bold text-lg sm:text-xl tracking-tight text-stone-900 leading-tight">
                     Sepaktakraw Association Of Madhya Pradesh

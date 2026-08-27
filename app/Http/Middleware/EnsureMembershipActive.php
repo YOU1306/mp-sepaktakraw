@@ -22,6 +22,8 @@ class EnsureMembershipActive
             $allowed = [
                 'membership.renew',
                 'membership.renew.process',
+                'membership.checkout',
+                'membership.renew.confirm',
                 'logout',
             ];
 

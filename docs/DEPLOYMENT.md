@@ -183,52 +183,41 @@ individual registration form):
    - UIDAI rotates this certificate occasionally — re-download and swap it in
      if verification suddenly starts failing for everyone.
 
-## 6. ⚠️ Razorpay — current status, read before touching `.env`
+## 6. Razorpay — configure keys (integration is complete)
 
-**Important — this is a real gap, not just a config step.** Today the code
-has a `PaymentService::isTestMode()` stub, not a finished Razorpay
-integration:
+The gateway code path is finished:
 
-- If `RAZORPAY_KEY` / `RAZORPAY_SECRET` are **left blank**, the payment page
-  shows a "Test Mode" button that just marks the payment as paid — no
-  gateway is called at all. This is fine for demoing the flow.
-- The moment real Razorpay keys are put in `.env`, the code switches to a
-  branch that expects a signed `razorpay_payment_id`/`razorpay_signature`
-  from the browser — but **the Razorpay Checkout.js widget is not wired up
-  in `resources/views/registration/payment.blade.php` yet, there's no
-  signature-verification logic, and there's no webhook route/controller.**
-  Adding real keys right now would break the payment step for real users.
-- Separately, and why this hasn't bitten anyone yet: `Setting::fee(...)`
-  defaults to **₹0** for both Federation and Club registrations
-  (`SettingSeeder`), and the controllers **skip the payment page entirely
-  when the fee is 0**. So right now, nobody is actually charged anything.
+- Server creates a Razorpay order via `PaymentService::createOrder()` when
+  `RAZORPAY_KEY` + `RAZORPAY_SECRET` are set; otherwise it stays in local
+  **test mode** (one-click simulate pay, no gateway call).
+- Checkout.js is wired on registration (`resources/views/registration/payment.blade.php`)
+  and membership renewal (`resources/views/membership/checkout.blade.php`).
+- Browser callback HMAC is verified in `PaymentController::process()` and
+  `MembershipController::confirm()` before `markPaid()`.
+- Authoritative confirmation is `POST /webhooks/payment` (`WebhookController`),
+  CSRF-exempt, signature-checked with `RAZORPAY_WEBHOOK_SECRET` over the raw body.
+- `markPaid()` is idempotent (row lock) so browser callback + webhook cannot
+  double-extend membership or double-notify reviewers.
 
-**What this means for launch:**
-1. **Leave `RAZORPAY_KEY`/`RAZORPAY_SECRET`/`RAZORPAY_WEBHOOK_SECRET` blank
-   in production `.env` for now**, and **keep the federation/club fees at
-   ₹0** in Settings (admin panel) until the gateway integration below is
-   finished. This lets you launch the site — content, registrations,
-   approvals, all fully working — without the unfinished payment path being
-   reachable.
-2. Before you turn on any non-zero fee, the following needs to be built
-   (flag this as a follow-up task, separate from server deployment):
-   - Razorpay Checkout.js on the payment page (create the order server-side
-     as already coded, then actually open the widget client-side).
-   - Server-side HMAC-SHA256 signature verification in
-     `PaymentController::process()` before calling `markPaid()`.
-   - A `/webhooks/razorpay` route + controller verifying the webhook
-     signature, so payments are recorded even if the browser tab closes
-     mid-flow (this is the authoritative source of truth per
-     `ARCHITECTURE.md` §6).
-3. Once that's built, get **test** API keys from
+**Local / demo:** leave `RAZORPAY_KEY` / `RAZORPAY_SECRET` /
+`RAZORPAY_WEBHOOK_SECRET` blank. Fees from `SettingSeeder` still apply; the
+payment page shows a Test Mode button.
+
+**Before charging real money:**
+
+1. Get **test** API keys from
    [dashboard.razorpay.com](https://dashboard.razorpay.com/) (Test Mode
-   toggle, top-left → **Settings → API Keys**) and exercise a full test
-   payment (Razorpay's test card `4111 1111 1111 1111`, any future
-   expiry/CVV) before turning on real fees.
-4. **Going live with real money later:** complete Razorpay KYC/business
-   verification, switch the dashboard to Live Mode, generate live keys, and
-   swap the three `RAZORPAY_*` values in `.env` — no further code changes
-   needed at that point.
+   toggle → **Settings → API Keys**). Put them in `.env` as `RAZORPAY_KEY`
+   and `RAZORPAY_SECRET`.
+2. Create a webhook pointing at `https://yourdomain.in/webhooks/payment` for
+   event `payment.captured`. Copy the webhook secret into
+   `RAZORPAY_WEBHOOK_SECRET`.
+3. Run a full test payment (card `4111 1111 1111 1111`, any future expiry/CVV)
+   and confirm registration → Checkout → success page → webhook → under_review
+   (and membership renew → Checkout → dashboard).
+4. **Going live:** complete Razorpay KYC, switch the dashboard to Live Mode,
+   swap the three `RAZORPAY_*` values, keep non-zero fees in Settings — no
+   further code changes needed.
 
 ## 7. 🧑 First deploy
 
@@ -298,15 +287,12 @@ entire deploy process.
 - [ ] Confirm the UIDAI certificate is in place and at least one real Aadhaar
   Offline e-KYC upload shows "✓ Digitally verified" in the admin review
   screen (not just "manual check required").
-- [ ] Confirm Federation/Club fees are still **₹0** in Settings until the
-  Razorpay Checkout.js + signature verification + webhook work (step 6) is
-  done — don't turn on real fees before that.
-- [ ] Once that integration work is done: run a full Razorpay **test-mode**
-  payment end to end (card `4111 1111 1111 1111`, any future expiry/CVV) to
-  confirm registration → payment → webhook → approval works, before going
-  live with real money.
+- [ ] Run a full Razorpay **test-mode** payment end to end (card
+  `4111 1111 1111 1111`, any future expiry/CVV) to confirm registration →
+  Checkout → webhook → under_review, and membership renew → Checkout →
+  dashboard, before going live with real money.
 - [ ] When ready for real payments: complete Razorpay KYC, flip to live
-  keys, set the real fee amounts in Settings, and do one small real
+  keys, confirm fee amounts in Settings, and do one small real
   transaction yourself to confirm.
 - [ ] Optional (Tier 1 in `ARCHITECTURE.md`): put the free tier of
   **Cloudflare** in front of the domain for CDN/WAF/DDoS protection once
