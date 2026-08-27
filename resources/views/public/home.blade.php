@@ -53,7 +53,7 @@
                      alt="Sepaktakraw Federation of India leadership team"
                      class="w-full h-auto" loading="lazy">
                 <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
-                    Sepaktakraw Federation of India
+                    Sepaktakraw Federation of Madhya Pradesh
                 </figcaption>
             </figure>
 
@@ -67,7 +67,7 @@
                      alt="Sepaktakraw leadership and team"
                      class="w-full h-auto" loading="lazy">
                 <figcaption class="px-4 py-3 border-t border-stone-100 bg-stone-50 text-xs font-medium text-stone-600 uppercase tracking-wide">
-                    Our Leadership
+                    Sepaktakraw Federation of Madhya Pradesh
                 </figcaption>
             </figure>
         </div>
